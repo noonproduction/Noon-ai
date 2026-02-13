@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* ---- CSS VARIABLES FOR THEMES ---- */
+        /* ---- CSS VARIABLES ---- */
         :root {
             --bg-color: #000000;
             --text-color: #ffffff;
@@ -21,7 +21,6 @@
             --user-text: #ffffff;
             --bot-msg-bg: rgba(255, 255, 255, 0.08);
             --bot-text: #e5e7eb;
-            --input-bg: rgba(255, 255, 255, 0.05);
         }
 
         [data-theme="light"] {
@@ -35,7 +34,6 @@
             --user-text: #ffffff;
             --bot-msg-bg: rgba(255, 255, 255, 0.8);
             --bot-text: #374151;
-            --input-bg: rgba(255, 255, 255, 0.9);
         }
 
         body {
@@ -47,35 +45,14 @@
             transition: background 0.5s ease;
         }
 
-        /* LIQUID BACKGROUND ANIMATION */
-        .liquid-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-        .blob {
-            position: absolute;
-            filter: blur(80px);
-            border-radius: 50%;
-            animation: float 20s infinite alternate;
-        }
-        .blob-1 {
-            top: -10%; left: -10%; width: 50vw; height: 50vw;
-            background: var(--blob-1);
-            animation-duration: 25s;
-        }
-        .blob-2 {
-            bottom: -10%; right: -10%; width: 50vw; height: 50vw;
-            background: var(--blob-2);
-            animation-delay: -5s;
-        }
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 50px) scale(1.1); }
-        }
+        /* LIQUID BACKGROUND */
+        .liquid-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .blob { position: absolute; filter: blur(80px); border-radius: 50%; animation: float 20s infinite alternate; }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--blob-1); animation-duration: 25s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: var(--blob-2); animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
 
-        /* GLASS MORPHISM CLASSES */
+        /* GLASS STYLES */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -84,87 +61,32 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
 
-        /* CHAT BUBBLES */
-        .msg {
-            max-width: 85%;
-            padding: 12px 16px;
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            position: relative;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .user-msg {
-            align-self: flex-end;
-            background: var(--user-msg-bg);
-            color: var(--user-text);
-            border-radius: 20px 20px 4px 20px;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
-        }
-        .bot-msg {
-            align-self: flex-start;
-            background: var(--bot-msg-bg);
-            color: var(--bot-text);
-            border-radius: 20px 20px 20px 4px;
-            border: 1px solid var(--glass-border);
-        }
+        /* MESSAGES */
+        .msg { max-width: 85%; padding: 12px 16px; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; position: relative; animation: popIn 0.3s; word-wrap: break-word;}
+        .user-msg { align-self: flex-end; background: var(--user-msg-bg); color: var(--user-text); border-radius: 20px 20px 4px 20px; }
+        .bot-msg { align-self: flex-start; background: var(--bot-msg-bg); color: var(--bot-text); border-radius: 20px 20px 20px 4px; border: 1px solid var(--glass-border); }
+        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
 
-        /* FEEDBACK BUTTONS */
-        .feedback-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 8px;
-            opacity: 0.7;
-        }
-        .feedback-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: transform 0.2s;
-            color: var(--text-color);
-            opacity: 0.5;
-        }
-        .feedback-btn:hover { transform: scale(1.2); opacity: 1; }
-        .feedback-btn.active { opacity: 1; color: #22c55e; } /* Green for like */
-        .feedback-btn.dislike.active { color: #ef4444; } /* Red for dislike */
+        @keyframes popIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes popIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* TOAST NOTIFICATION */
-        #toast {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: rgba(16, 185, 129, 0.9); /* Green */
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            font-weight: 500;
-            display: flex;
+        /* IMAGE PREVIEW AREA */
+        #image-preview-container {
+            display: none;
+            padding: 10px;
+            margin: 0 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
         }
-        #toast.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
-        }
+        #preview-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid white; }
+
+        /* TOAST */
+        #toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #10b981; color: white; padding: 10px 20px; border-radius: 25px; opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 100; display: flex; align-items: center; gap: 8px; }
+        #toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
         /* SETTINGS MODAL */
-        #settings-modal {
-            transition: opacity 0.3s ease;
-        }
+        #settings-modal { transition: opacity 0.3s ease; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 5px; }
@@ -173,180 +95,156 @@
 </head>
 <body data-theme="dark">
 
-    <div class="liquid-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-    </div>
-
-    <div id="toast">
-        <i class="fas fa-check-circle"></i> Thanks for your feedback!
-    </div>
+    <div class="liquid-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    
+    <div id="toast"><i class="fas fa-check-circle"></i> Thanks for your feedback!</div>
 
     <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass w-full max-w-sm rounded-3xl p-6 relative transform transition-all scale-95 opacity-0" id="settings-content">
-            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            
+            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-lg">
-                    <i class="fas fa-robot text-white text-3xl"></i>
-                </div>
+                <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-20 h-20 rounded-2xl mx-auto mb-3 shadow-lg object-cover">
                 <h2 class="text-xl font-bold">Noon AI Pro</h2>
-                <p class="text-xs opacity-60">Version 1.0.5</p>
+                <p class="text-xs opacity-60">Version 2.0 (Vision)</p>
             </div>
-
             <div class="space-y-4">
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
-                    <p class="text-xs text-gray-400 mb-1">Developer Contact</p>
-                    <p class="font-medium text-sm flex items-center gap-2">
-                        <i class="fas fa-envelope text-cyan-400"></i> connect.noonai@gmail.com
-                    </p>
-                </div>
-                
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center">
-                    <span class="text-sm">Dark Mode</span>
-                    <button onclick="toggleTheme()" class="w-10 h-6 rounded-full bg-white/20 relative transition-colors" id="theme-toggle-btn">
-                        <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform" id="theme-knob"></div>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="mt-6 text-center text-xs opacity-40">
-                Powered by Noon Production
+                <div class="p-3 rounded-xl bg-white/5 border border-white/10"><p class="text-xs text-gray-400 mb-1">Developer Contact</p><p class="font-medium text-sm flex items-center gap-2"><i class="fas fa-envelope text-cyan-400"></i> connect.noonai@gmail.com</p></div>
+                <div class="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center"><span class="text-sm">Dark Mode</span><button onclick="toggleTheme()" class="w-10 h-6 rounded-full bg-white/20 relative transition-colors" id="theme-toggle-btn"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform" id="theme-knob"></div></button></div>
             </div>
         </div>
     </div>
 
     <div class="flex flex-col h-full max-w-md mx-auto relative z-10">
         
-        <div class="glass p-4 flex items-center justify-between z-20 mx-2 mt-2 rounded-2xl">
+        <div class="glass p-3 flex items-center justify-between z-20 mx-2 mt-2 rounded-2xl">
             <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSettings()">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-md">
-                    <i class="fas fa-robot text-white"></i>
-                </div>
+                <img src="logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-10 h-10 rounded-xl object-cover shadow-md border border-white/10">
                 <div>
                     <h1 class="font-bold text-lg leading-tight">Noon AI</h1>
-                    <div class="flex items-center gap-1">
-                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        <span class="text-xs opacity-70">Online</span>
-                    </div>
+                    <div class="flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span><span class="text-xs opacity-70">Online</span></div>
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">
-                    <i class="fas fa-moon" id="theme-icon"></i>
-                </button>
-                <button onclick="clearChat()" class="w-10 h-10 rounded-full glass flex items-center justify-center text-red-400 hover:bg-red-500/10 transition">
-                    <i class="fas fa-trash"></i>
-                </button>
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition"><i class="fas fa-moon" id="theme-icon"></i></button>
+                <button onclick="clearChat()" class="w-10 h-10 rounded-full glass flex items-center justify-center text-red-400 hover:bg-red-500/10 transition"><i class="fas fa-trash"></i></button>
             </div>
         </div>
 
         <div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col pt-6 pb-4">
             <div class="bot-msg msg">
-                <div class="flex items-center gap-2 mb-1">
-                    <i class="fas fa-sparkles text-cyan-400"></i>
-                    <span class="text-xs font-bold opacity-70">Noon AI</span>
-                </div>
-                Hello! I am Noon AI. How can I assist you today?
+                <div class="flex items-center gap-2 mb-1"><i class="fas fa-sparkles text-cyan-400"></i><span class="text-xs font-bold opacity-70">Noon AI</span></div>
+                Hello! I can now see photos. Upload one to try!
             </div>
         </div>
 
+        <div id="image-preview-container">
+            <div class="flex items-center gap-3">
+                <img id="preview-img" src="" alt="Preview">
+                <span class="text-xs opacity-70">Image selected</span>
+            </div>
+            <button onclick="removeImage()" class="text-red-400"><i class="fas fa-times-circle"></i></button>
+        </div>
+
         <div class="p-4 z-20">
-            <div class="glass p-2 pl-4 rounded-[25px] flex items-center gap-2">
-                <button class="w-8 h-8 flex items-center justify-center text-cyan-400 hover:bg-white/10 rounded-full transition">
-                    <i class="fas fa-plus"></i>
+            <div class="glass p-2 pl-2 rounded-[25px] flex items-center gap-2">
+                <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+                
+                <button onclick="document.getElementById('image-input').click()" class="w-10 h-10 flex items-center justify-center text-cyan-400 hover:bg-white/10 rounded-full transition">
+                    <i class="fas fa-plus text-lg"></i>
                 </button>
+                
                 <form id="chat-form" class="flex-1 flex gap-2" onsubmit="sendMessage(event)">
-                    <input type="text" id="msg-input" 
-                        class="w-full bg-transparent outline-none placeholder-gray-400/70 font-light text-sm"
-                        style="color: var(--text-color);"
-                        placeholder="Type a message..." autocomplete="off">
-                    <button type="submit" 
-                        class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition transform">
-                        <i class="fas fa-paper-plane text-sm relative left-[1px]"></i>
-                    </button>
+                    <input type="text" id="msg-input" class="w-full bg-transparent outline-none placeholder-gray-400/70 font-light text-sm" style="color: var(--text-color);" placeholder="Type a message..." autocomplete="off">
+                    <button type="submit" class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition transform"><i class="fas fa-paper-plane text-sm relative left-[1px]"></i></button>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔥 YOUR REPLIT URL
+        // 🔥 YOUR REPLIT URL HERE
         const BACKEND_URL = "https://879a9d65-a264-4177-9167-2711221fa0f5-00-3j9ytr2tbdy5b.sisko.replit.dev/chat";
 
-        // THEME HANDLING
         let isDark = true;
-        
+        let selectedImageBase64 = null;
+
         function toggleTheme() {
             isDark = !isDark;
             document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            
-            // Update Icons
-            const icon = document.getElementById('theme-icon');
-            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun text-orange-400';
-            
-            // Update Toggle Switch
-            const knob = document.getElementById('theme-knob');
-            knob.style.transform = isDark ? 'translateX(0)' : 'translateX(100%)';
+            document.getElementById('theme-icon').className = isDark ? 'fas fa-moon' : 'fas fa-sun text-orange-400';
+            document.getElementById('theme-knob').style.transform = isDark ? 'translateX(0)' : 'translateX(100%)';
             document.getElementById('theme-toggle-btn').style.backgroundColor = isDark ? 'rgba(255,255,255,0.2)' : '#3b82f6';
         }
 
-        // SETTINGS MODAL HANDLING
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
             const content = document.getElementById('settings-content');
-            
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
-                setTimeout(() => {
-                    content.classList.remove('scale-95', 'opacity-0');
-                    content.classList.add('scale-100', 'opacity-100');
-                }, 10);
+                setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); content.classList.add('scale-100', 'opacity-100'); }, 10);
             } else {
-                content.classList.remove('scale-100', 'opacity-100');
-                content.classList.add('scale-95', 'opacity-0');
+                content.classList.remove('scale-100', 'opacity-100'); content.classList.add('scale-95', 'opacity-0');
                 setTimeout(() => modal.classList.add('hidden'), 300);
             }
         }
 
-        // CHAT LOGIC
+        // IMAGE HANDLING
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImageBase64 = e.target.result;
+                    document.getElementById('preview-img').src = selectedImageBase64;
+                    document.getElementById('image-preview-container').style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            selectedImageBase64 = null;
+            document.getElementById('image-input').value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+        }
+
         async function sendMessage(e) {
             e.preventDefault();
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
-            if (!text) return;
+            
+            // Allow sending if there is text OR an image
+            if (!text && !selectedImageBase64) return;
 
-            addMessage(text, 'user');
-            input.value = '';
-
-            // 🔥 IDENTITY CHECK (Client Side Override)
-            const lowerText = text.toLowerCase();
-            if (lowerText.includes('who are you') || lowerText.includes('oyaa kawuda') || lowerText.includes('oya kawuda')) {
-                setTimeout(() => {
-                    addMessage("I am Noon AI, a smart assistant created by Noon Production.", 'bot');
-                }, 600);
-                return;
+            // Display User Message
+            let userContent = text;
+            if (selectedImageBase64) {
+                userContent += `<br><img src="${selectedImageBase64}" class="w-32 rounded-lg">`;
             }
+            addMessage(userContent, 'user');
+            
+            input.value = '';
+            const currentImage = selectedImageBase64; // Store temp to send
+            removeImage(); // Clear UI
 
-            // Loading State
+            // Loading
             const loadingId = addLoading();
 
             try {
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ 
+                        message: text,
+                        image: currentImage // Send image data
+                    })
                 });
                 const data = await response.json();
-                
                 removeLoading(loadingId);
                 addMessage(data.reply, 'bot');
-
             } catch (error) {
                 removeLoading(loadingId);
-                addMessage("Server is sleeping... waking it up! Try again in 10s.", 'bot');
+                addMessage("Brain is sleeping... try again in 10s.", 'bot');
             }
         }
 
@@ -355,26 +253,21 @@
             const div = document.createElement('div');
             div.className = sender === 'user' ? 'user-msg msg' : 'bot-msg msg';
             
-            let content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-            
-            // Add Header for Bot
-            if (sender === 'bot') {
-                content = `
-                    <div class="flex items-center gap-2 mb-1">
-                        <i class="fas fa-sparkles text-cyan-400"></i>
-                        <span class="text-xs font-bold opacity-70">Noon AI</span>
-                    </div>
-                    ${content}
-                    <div class="feedback-actions">
-                        <button class="feedback-btn" onclick="handleFeedback(this, 'like')"><i class="fas fa-thumbs-up"></i></button>
-                        <button class="feedback-btn dislike" onclick="handleFeedback(this, 'dislike')"><i class="fas fa-thumbs-down"></i></button>
-                    </div>
-                `;
+            let content = text;
+            if(!text.includes('<img')) {
+                 content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
             }
 
+            if (sender === 'bot') {
+                content = `
+                    <div class="flex items-center gap-2 mb-1"><i class="fas fa-sparkles text-cyan-400"></i><span class="text-xs font-bold opacity-70">Noon AI</span></div>
+                    ${content}
+                    <div class="flex gap-3 mt-2 opacity-60"><button class="hover:scale-110 transition hover:text-green-400" onclick="toast()"><i class="fas fa-thumbs-up"></i></button><button class="hover:scale-110 transition hover:text-red-400" onclick="toast()"><i class="fas fa-thumbs-down"></i></button></div>
+                `;
+            }
             div.innerHTML = content;
             box.appendChild(div);
-            scrollToBottom();
+            box.scrollTop = box.scrollHeight;
         }
 
         function addLoading() {
@@ -385,46 +278,15 @@
             div.className = 'bot-msg msg flex items-center gap-2';
             div.innerHTML = `<i class="fas fa-circle-notch fa-spin text-cyan-400"></i> Thinking...`;
             box.appendChild(div);
-            scrollToBottom();
+            box.scrollTop = box.scrollHeight;
             return id;
         }
 
-        function removeLoading(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        }
-
-        function clearChat() {
-            const box = document.getElementById('chat-box');
-            box.innerHTML = `
-                <div class="bot-msg msg">
-                    <div class="flex items-center gap-2 mb-1">
-                        <i class="fas fa-sparkles text-cyan-400"></i>
-                        <span class="text-xs font-bold opacity-70">Noon AI</span>
-                    </div>
-                    Chat cleared. How can I help?
-                </div>`;
-        }
-
-        function scrollToBottom() {
-            const box = document.getElementById('chat-box');
-            box.scrollTop = box.scrollHeight;
-        }
-
-        // FEEDBACK HANDLER
-        function handleFeedback(btn, type) {
-            // Visual Change
-            const parent = btn.parentElement;
-            const buttons = parent.querySelectorAll('button');
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            // Show Toast
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
+        function removeLoading(id) { const el = document.getElementById(id); if (el) el.remove(); }
+        function clearChat() { document.getElementById('chat-box').innerHTML = ''; }
+        function toast() { 
+            const t = document.getElementById('toast'); t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 2000); 
         }
     </script>
 </body>
