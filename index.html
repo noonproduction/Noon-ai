@@ -15,67 +15,52 @@
         html, body { height: 100dvh; overflow: hidden; font-family: 'Poppins', sans-serif; background: var(--bg-color); color: var(--text-color); transition: background 0.3s; margin: 0; }
         .safe-area-top { padding-top: max(10px, env(safe-area-inset-top)); }
         .safe-area-bottom { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
-        
-        /* OVERLAYS */
+
+        /* SCREENS & ANIMATIONS */
         .overlay-screen { position: fixed; inset: 0; z-index: 200; background: var(--bg-color); display: flex; flex-direction: column; transition: opacity 0.5s; visibility: visible; }
         .overlay-screen.hidden-all { display: none !important; visibility: hidden; }
-        
-        /* ONBOARDING & AUTH STYLES */
         .slide { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px; animation: fadeIn 0.5s; }
         .slide.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* AUTH BOX */
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; }
         .auth-box { width: 100%; max-width: 320px; padding: 30px; border-radius: 24px; background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); text-align: center; }
         .auth-input { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-color); outline: none; transition: 0.3s; }
         .auth-input:focus { border-color: #3b82f6; background: rgba(255,255,255,0.1); }
 
-        /* MAIN APP */
+        /* APP LAYOUT */
         #app-wrapper { display: flex; height: 100%; width: 100%; overflow: hidden; opacity: 0; transition: opacity 0.5s; }
         #app-wrapper.visible { opacity: 1; }
-        
         #sidebar { width: 280px; background: var(--sidebar-bg); height: 100%; position: absolute; left: -280px; top: 0; z-index: 50; transition: transform 0.3s ease; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
         #sidebar.open { transform: translateX(280px); box-shadow: 5px 0 30px rgba(0,0,0,0.5); }
         .history-item { padding: 12px; margin: 5px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; opacity: 0.7; }
         .history-item.active { background: var(--glass-bg); opacity: 1; }
-        
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 40; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
         #overlay.show { opacity: 1; pointer-events: auto; }
-        
         #main-chat { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 10; height: 100%; }
-        .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); }
         
+        /* CHAT BUBBLES */
+        .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); }
         .msg { max-width: 85%; padding: 12px 16px; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; border-radius: 18px; word-wrap: break-word; }
         .user-msg { align-self: flex-end; background: var(--user-msg-bg); color: white; border-bottom-right-radius: 4px; }
         .bot-msg { align-self: flex-start; background: var(--bot-msg-bg); color: var(--text-color); border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
         
-        /* COUNTDOWN LOADER */
+        /* LOADER */
         .countdown-loader { font-family: monospace; color: #a855f7; font-weight: bold; display: flex; align-items: center; gap: 8px; }
         .countdown-circle { width: 20px; height: 20px; border: 3px solid rgba(168, 85, 247, 0.3); border-top-color: #a855f7; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        #toast { position: fixed; top: 80px; left: 50%; transform: translate(-50%, -20px); background: #10b981; color: white; padding: 8px 16px; border-radius: 50px; opacity: 0; transition: 0.3s; z-index: 100; pointer-events: none; }
-        #toast.show { opacity: 1; transform: translate(-50%, 0); }
     </style>
 </head>
 <body data-theme="dark">
 
     <div id="onboarding-screen" class="overlay-screen hidden-all">
         <div class="slide active" id="slide-1">
-            <div class="w-24 h-24 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-sparkles text-4xl text-white"></i></div>
-            <h1 class="text-3xl font-bold mb-4">Welcome to Noon AI</h1>
-            <p class="opacity-70 px-6">Unlimited Intelligence. Free Forever.</p>
-        </div>
-        <div class="slide" id="slide-2">
-            <h1 class="text-3xl font-bold mb-4">No Limits</h1>
-            <p class="opacity-70 px-6">Chat as much as you want without restrictions.</p>
-        </div>
-        <div class="slide" id="slide-3">
-            <h1 class="text-3xl font-bold mb-4">Create Art</h1>
-            <p class="opacity-70 px-6">Generate amazing images instantly.</p>
+            <h1 class="text-3xl font-bold mb-4">Noon AI Unlimited</h1>
+            <p class="opacity-70 px-6">No Limits. No API Keys. Free.</p>
         </div>
         <div class="w-full p-8 mt-auto safe-area-bottom">
-            <button onclick="nextSlide()" id="next-btn" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl shadow-lg transition">Next</button>
+            <button onclick="nextSlide()" id="next-btn" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl shadow-lg transition">Start Now</button>
         </div>
     </div>
 
@@ -83,19 +68,18 @@
         <div class="auth-container">
             <div class="auth-box">
                 <img src="./IMG-20260206-WA0016.jpg" class="w-20 h-20 rounded-2xl mx-auto mb-4 object-contain shadow-lg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
-                <h2 class="text-2xl font-bold mb-2">Noon AI Pro</h2>
-                <p class="text-sm opacity-60 mb-6">Unlimited Access</p>
+                <h2 class="text-2xl font-bold mb-2">Noon AI</h2>
                 <div id="login-form">
                     <input type="text" id="login-user" placeholder="Username" class="auth-input">
                     <input type="password" id="login-pass" placeholder="Password" class="auth-input">
-                    <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-4 hover:bg-blue-500 transition">Log In</button>
-                    <p class="mt-4 text-xs opacity-60">New here? <span class="text-blue-400 cursor-pointer font-bold" onclick="showSignup()">Sign Up</span></p>
+                    <button onclick="login()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl mt-4">Log In</button>
+                    <p class="mt-4 text-xs opacity-60">New? <span class="text-blue-400 font-bold" onclick="showSignup()">Sign Up</span></p>
                 </div>
                 <div id="signup-form" class="hidden">
                     <input type="text" id="signup-user" placeholder="Create Username" class="auth-input">
                     <input type="password" id="signup-pass" placeholder="Create Password" class="auth-input">
-                    <button onclick="signup()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl mt-4 hover:bg-green-500 transition">Sign Up</button>
-                    <p class="mt-4 text-xs opacity-60">Have account? <span class="text-green-400 cursor-pointer font-bold" onclick="showLogin()">Log In</span></p>
+                    <button onclick="signup()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl mt-4">Sign Up</button>
+                    <p class="mt-4 text-xs opacity-60">Have account? <span class="text-green-400 font-bold" onclick="showLogin()">Log In</span></p>
                 </div>
             </div>
         </div>
@@ -107,20 +91,13 @@
         <div id="sidebar">
             <div class="p-4 safe-area-top">
                 <div class="flex items-center gap-3 mb-6 px-2">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg" id="avatar">U</div>
-                    <div>
-                        <h3 class="font-bold text-sm" id="username-display">User</h3>
-                        <p class="text-xs opacity-50">Unlimited Plan</p>
-                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white" id="avatar">U</div>
+                    <div><h3 class="font-bold text-sm" id="username-display">User</h3><p class="text-xs opacity-50">Unlimited</p></div>
                 </div>
-                <button onclick="startNewChat()" class="w-full glass p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition">
-                    <i class="fas fa-plus text-cyan-400"></i><span>New Chat</span>
-                </button>
+                <button onclick="startNewChat()" class="w-full glass p-3 rounded-xl flex items-center gap-3 mb-2"><i class="fas fa-plus text-cyan-400"></i> New Chat</button>
             </div>
-            <div class="px-4 pb-2 text-xs font-bold opacity-50 uppercase">History</div>
             <div class="flex-1 overflow-y-auto" id="history-list"></div>
             <div class="p-4 border-t border-white/10">
-                <button onclick="toggleSettings()" class="flex items-center gap-3 opacity-70 w-full mb-3"><i class="fas fa-cog"></i> Settings</button>
                 <button onclick="doLogout()" class="flex items-center gap-3 text-red-400 w-full"><i class="fas fa-sign-out-alt"></i> Log Out</button>
             </div>
         </div>
@@ -130,17 +107,14 @@
                 <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSidebar()">
                     <i class="fas fa-bars text-xl opacity-80"></i>
                     <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 border border-white/10">
-                    <div>
-                        <h1 class="font-bold text-lg leading-tight">Noon AI</h1>
-                        <div class="flex items-center gap-1.5"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span><span class="text-[10px] font-medium opacity-70">ONLINE</span></div>
-                    </div>
+                    <div><h1 class="font-bold text-lg">Noon AI</h1><span class="text-[10px] font-medium opacity-70">ONLINE</span></div>
                 </div>
-                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10"><i class="fas fa-moon" id="theme-icon"></i></button>
+                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full glass flex items-center justify-center"><i class="fas fa-moon" id="theme-icon"></i></button>
             </div>
 
             <div id="chat-box" class="flex-1 overflow-y-auto px-4 py-2 flex flex-col scroll-smooth"></div>
-
-            <div id="image-preview" class="hidden px-4 py-2 mx-4 mb-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 items-center justify-between shrink-0">
+            
+            <div id="image-preview" class="hidden px-4 py-2 mx-4 mb-2 bg-black/40 rounded-xl flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3"><img id="preview-img" class="w-10 h-10 rounded-lg object-cover"><span>Attached</span></div>
                 <button onclick="removeImage()"><i class="fas fa-times"></i></button>
             </div>
@@ -148,71 +122,51 @@
             <div class="p-3 z-20 safe-area-bottom shrink-0">
                 <div class="glass p-1.5 pl-2 rounded-[28px] flex items-center gap-2 shadow-xl">
                     <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleImage(event)">
-                    <button onclick="document.getElementById('image-input').click()" class="w-10 h-10 flex items-center justify-center text-cyan-400 hover:bg-white/10 rounded-full transition active:scale-90"><i class="fas fa-plus text-lg"></i></button>
-                    <button onclick="generateImageWithTimer(event)" class="w-10 h-10 flex items-center justify-center text-purple-400 hover:bg-white/10 rounded-full transition active:scale-90"><i class="fas fa-palette text-lg"></i></button>
+                    <button onclick="document.getElementById('image-input').click()" class="w-10 h-10 flex items-center justify-center text-cyan-400"><i class="fas fa-plus text-lg"></i></button>
+                    <button onclick="generateImageWithTimer(event)" class="w-10 h-10 flex items-center justify-center text-purple-400"><i class="fas fa-palette text-lg"></i></button>
                     <form class="flex-1 flex gap-2" onsubmit="sendMessage(event)">
                         <input type="text" id="msg-input" class="w-full bg-transparent outline-none text-sm px-2" style="color: var(--text-color);" placeholder="Message..." autocomplete="off">
-                        <button type="submit" class="w-10 h-10 bg-blue-600 rounded-full text-white shadow-lg"><i class="fas fa-paper-plane text-sm translate-x-px translate-y-px"></i></button>
+                        <button type="submit" class="w-10 h-10 bg-blue-600 rounded-full text-white shadow-lg"><i class="fas fa-paper-plane"></i></button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="settings-modal" class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass w-full max-w-sm rounded-3xl p-6 relative" id="settings-content">
-            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
-            <div class="text-center">
-                <h2 class="text-xl font-bold">Noon AI Pro</h2>
-                <p class="text-xs opacity-60">Version 6.0 (Unlimited)</p>
-            </div>
-            <div class="mt-4 space-y-2">
-                <button onclick="clearAllHistory()" class="w-full p-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">Clear History</button>
-            </div>
-        </div>
-    </div>
-    <div id="toast">Saved!</div>
-
     <script>
-        // 🔥 NEW BACKEND: Pollinations AI (Unlimited & Free)
-        const TEXT_API_URL = "https://text.pollinations.ai/";
+        // 🔥 NEW BACKEND: GET Request Method (Fixes CORS/Connection Error)
+        // This is much simpler and works on all devices without keys.
         
-        let isDark = true; imgData = null; sessions = []; currentSessionId = null; currentSlide = 1; currentUser = null;
+        let isDark = true; imgData = null; sessions = []; currentSessionId = null; currentUser = null;
 
-        // --- 1. INITIALIZATION ---
         window.onload = function() {
             if(localStorage.getItem('noon_theme') === 'light') toggleTheme();
             const obDone = localStorage.getItem('noon_ob_completed');
-            if (!obDone) {
-                document.getElementById('onboarding-screen').classList.remove('hidden-all');
-            } else {
-                checkAuth();
-            }
+            if (!obDone) document.getElementById('onboarding-screen').classList.remove('hidden-all');
+            else checkAuth();
         };
 
-        // --- 2. AUTH SYSTEM ---
+        // --- AUTH ---
         function checkAuth() {
             const user = localStorage.getItem('noon_active_user');
             if (user) { currentUser = user; enterApp(); } 
-            else { document.getElementById('auth-screen').classList.remove('hidden-all'); }
+            else document.getElementById('auth-screen').classList.remove('hidden-all');
         }
         function showSignup() { document.getElementById('login-form').classList.add('hidden'); document.getElementById('signup-form').classList.remove('hidden'); }
         function showLogin() { document.getElementById('signup-form').classList.add('hidden'); document.getElementById('login-form').classList.remove('hidden'); }
         function signup() {
-            const u = document.getElementById('signup-user').value.trim();
-            const p = document.getElementById('signup-pass').value.trim();
+            const u = document.getElementById('signup-user').value.trim(); const p = document.getElementById('signup-pass').value.trim();
             if(!u || !p) return alert("Fill all fields");
             let users = JSON.parse(localStorage.getItem('noon_users_db') || '{}');
-            if(users[u]) return alert("Username taken");
+            if(users[u]) return alert("Taken");
             users[u] = p; localStorage.setItem('noon_users_db', JSON.stringify(users));
-            alert("Created! Login now."); showLogin();
+            alert("Success!"); showLogin();
         }
         function login() {
-            const u = document.getElementById('login-user').value.trim();
-            const p = document.getElementById('login-pass').value.trim();
+            const u = document.getElementById('login-user').value.trim(); const p = document.getElementById('login-pass').value.trim();
             let users = JSON.parse(localStorage.getItem('noon_users_db') || '{}');
             if(users[u] && users[u] === p) { localStorage.setItem('noon_active_user', u); currentUser = u; enterApp(); }
-            else alert("Invalid login");
+            else alert("Invalid");
         }
         function doLogout() { if(confirm("Log out?")) { localStorage.removeItem('noon_active_user'); location.reload(); } }
         function enterApp() {
@@ -223,61 +177,58 @@
             document.getElementById('avatar').innerText = currentUser.charAt(0).toUpperCase();
             loadSessions();
         }
-
-        // --- 3. ONBOARDING ---
         function nextSlide() {
-            if (currentSlide < 3) {
-                document.getElementById(`slide-${currentSlide}`).classList.remove('active');
-                currentSlide++;
-                document.getElementById(`slide-${currentSlide}`).classList.add('active');
-                if(currentSlide === 3) document.getElementById('next-btn').innerText = "Get Started";
-            } else {
-                localStorage.setItem('noon_ob_completed', 'true');
-                document.getElementById('onboarding-screen').style.opacity = '0';
-                setTimeout(() => { document.getElementById('onboarding-screen').classList.add('hidden-all'); checkAuth(); }, 500);
-            }
+            localStorage.setItem('noon_ob_completed', 'true');
+            document.getElementById('onboarding-screen').style.opacity = '0';
+            setTimeout(() => { document.getElementById('onboarding-screen').classList.add('hidden-all'); checkAuth(); }, 500);
         }
 
-        // --- 4. UNLIMITED TEXT CHAT ---
+        // --- UNLIMITED CHAT LOGIC (GET METHOD) ---
         async function sendMessage(e) {
-            e.preventDefault(); const input = document.getElementById('msg-input'); const text = input.value.trim(); if (!text && !imgData) return;
+            e.preventDefault(); const input = document.getElementById('msg-input'); const text = input.value.trim();
+            if (!text && !imgData) return;
+
             const session = sessions.find(s => s.id === currentSessionId);
             if(session.messages.length === 1 && text) { session.title = text.slice(0, 20); renderSidebar(); }
-            
-            // Build Context
-            let context = session.messages.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.rawText || m.html })).slice(-10);
-            context.push({ role: "user", content: text });
 
+            // Show User Message
             let html = text + (imgData ? `<br><img src='${imgData}' class='rounded-lg mt-2'>` : '');
-            addMsg(html, 'user', text); input.value = ''; const toSendImg = imgData; removeImage(); const loadId = showLoad();
+            addMsg(html, 'user'); input.value = ''; const toSendImg = imgData; removeImage(); 
+            const loadId = showLoad();
+
+            // 🔥 THE FIX: Using GET instead of POST to bypass CORS
+            // We construct the prompt by adding previous context manually to the URL
+            let promptContext = "";
+            const recentMsgs = session.messages.slice(-4); // Take last 4 messages for context
+            recentMsgs.forEach(m => {
+                if(m.role === 'user') promptContext += "User: " + (m.rawText || "Image") + "\n";
+                if(m.role === 'bot') promptContext += "AI: " + (m.rawText || "") + "\n";
+            });
+            promptContext += "User: " + text + "\nAI:";
+
+            const encodedPrompt = encodeURIComponent(promptContext);
+            const url = `https://text.pollinations.ai/${encodedPrompt}?model=openai`;
 
             try {
-                // 🔥 DIRECT CALL TO POLLINATIONS (UNLIMITED)
-                const res = await fetch(TEXT_API_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        messages: context,
-                        model: 'openai', // Uses GPT-4o or similar
-                        jsonMode: false
-                    })
-                });
-                const reply = await res.text();
-                rmLoad(loadId);
+                const res = await fetch(url);
+                if(!res.ok) throw new Error("Network");
+                const reply = await res.text(); // It returns plain text
                 
-                // Format Bold Text
-                let formattedReply = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
-                addMsg(formattedReply, 'bot', reply);
+                rmLoad(loadId);
+                let formatted = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+                addMsg(formatted, 'bot', reply);
             } catch (err) {
-                rmLoad(loadId); addMsg("Connection error. Please try again.", 'bot');
+                rmLoad(loadId);
+                addMsg("Connection error. Check internet.", 'bot');
             }
         }
 
-        // --- 5. IMAGE GEN (TIMER FIX) ---
+        // --- IMAGE GEN (TIMER) ---
         async function generateImageWithTimer(e) {
             e.preventDefault(); const input = document.getElementById('msg-input'); const prompt = input.value.trim();
-            if (!prompt) return alert("Type something to draw!");
+            if (!prompt) return alert("Type prompt!");
             addMsg(`🎨 Generate: "${prompt}"`, 'user'); input.value = '';
+            
             const seed = Math.floor(Math.random() * 999999);
             const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=1024&height=1024&nologo=true`;
             
@@ -295,29 +246,27 @@
                     clearInterval(timer);
                     const container = document.getElementById(tempId);
                     if(container) {
-                        container.innerHTML = `<div>Generated: <b>${prompt}</b><div class='relative'><img src='${imageUrl}' class='rounded-xl shadow-lg mt-2 w-full h-auto bg-white/5' onload="this.scrollIntoView()"><a href='${imageUrl}' target='_blank' class='absolute bottom-3 right-3 bg-black/70 p-2 rounded-full text-white'><i class='fas fa-download'></i></a></div></div>`;
+                        container.innerHTML = `<div>Generated: <b>${prompt}</b><div class='relative'><img src='${imageUrl}' class='rounded-xl shadow-lg mt-2 w-full h-auto bg-white/5'><a href='${imageUrl}' download="art.jpg" target='_blank' class='absolute bottom-3 right-3 bg-black/70 p-2 rounded-full text-white'><i class='fas fa-download'></i></a></div></div>`;
                     }
                 }
             }, 1000);
         }
 
-        // --- UTILS ---
+        // --- CORE FUNCTIONS ---
         function loadSessions() { const saved = localStorage.getItem(`noon_chats_${currentUser}`); if (saved) { sessions = JSON.parse(saved); if (sessions.length > 0) loadChat(sessions[0].id); else startNewChat(); } else startNewChat(); renderSidebar(); }
         function startNewChat() { const id = Date.now().toString(); sessions.unshift({id, title: "New Chat", messages: [{html: "Hello! I am Noon AI (Unlimited).", role: "bot"}]}); currentSessionId = id; saveSessions(); renderChat(sessions[0].messages); renderSidebar(); closeSidebar(); }
         function loadChat(id) { currentSessionId = id; const s = sessions.find(x => x.id === id); if(s) { renderChat(s.messages); renderSidebar(); closeSidebar(); } }
         function saveSessions() { localStorage.setItem(`noon_chats_${currentUser}`, JSON.stringify(sessions)); }
-        function renderSidebar() { document.getElementById('history-list').innerHTML = sessions.map(s => `<div class='history-item ${s.id === currentSessionId ? 'active' : ''}' onclick="loadChat('${s.id}')"><i class='fas fa-message'></i> <span class='truncate'>${s.title}</span></div>`).join(''); }
+        function renderSidebar() { document.getElementById('history-list').innerHTML = sessions.map(s => `<div class='history-item ${s.id === currentSessionId ? 'active' : ''}' onclick="loadChat('${s.id}')"><i class='fas fa-message text-cyan-400'></i> <span class='truncate'>${s.title}</span></div>`).join(''); }
         function renderChat(msgs) { document.getElementById('chat-box').innerHTML = msgs.map(m => `<div class='msg ${m.role === 'user' ? 'user-msg' : 'bot-msg'}'>${m.html}</div>`).join(''); document.getElementById('chat-box').scrollTop = 99999; }
         function addMsg(html, role, rawText='') { const s = sessions.find(x => x.id === currentSessionId); s.messages.push({html, role, rawText}); saveSessions(); renderChat(s.messages); }
         function showLoad() { const id = 'l-'+Date.now(); document.getElementById('chat-box').innerHTML += `<div id='${id}' class='msg bot-msg opacity-50'><i class='fas fa-circle-notch fa-spin'></i> Thinking...</div>`; document.getElementById('chat-box').scrollTop = 99999; return id; }
         function rmLoad(id) { document.getElementById(id)?.remove(); }
-        function clearAllHistory() { if(confirm("Clear history?")) { localStorage.removeItem(`noon_chats_${currentUser}`); sessions = []; startNewChat(); toggleSettings(); } }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
         function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
         function toggleTheme() { isDark = !isDark; document.body.setAttribute('data-theme', isDark ? 'dark' : 'light'); localStorage.setItem('noon_theme', isDark ? 'dark' : 'light'); }
-        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function handleImage(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = (x) => { imgData = x.target.result; document.getElementById('preview-img').src = imgData; document.getElementById('image-preview').classList.remove('hidden'); }; r.readAsDataURL(f); }
         function removeImage() { imgData = null; document.getElementById('image-preview').classList.add('hidden'); }
     </script>
 </body>
-</html>
+    </html>
