@@ -152,7 +152,7 @@
             <div class="text-center">
                 <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-16 h-16 rounded-xl mx-auto mb-2 shadow-lg object-contain bg-white/10 p-1">
                 <h2 class="text-xl font-bold">Noon AI Pro</h2>
-                <p class="text-xs opacity-60">Version 4.5 (Fixed Images)</p>
+                <p class="text-xs opacity-60">Version 4.8 (Stable Gen)</p>
             </div>
             <div class="mt-4 space-y-2">
                 <button onclick="resetOnboarding()" class="w-full p-3 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-3"><i class="fas fa-redo"></i> Reset Onboarding</button>
@@ -174,7 +174,7 @@
             if(localStorage.getItem('noon_theme') === 'light') toggleTheme();
         };
 
-        // 🔥 FIXED IMAGE GENERATION LOGIC (NO LOADING CHECK) 🔥
+        // 🔥 ROCK SOLID IMAGE GENERATION LOGIC 🔥
         async function generateImage(e) {
             e.preventDefault();
             const input = document.getElementById('msg-input');
@@ -184,32 +184,44 @@
             addMsg(`🎨 Generate: "${prompt}"`, 'user');
             input.value = '';
             
-            // Show loading initially
-            const loadId = showLoad("Painting your masterpiece...");
-
-            // Use random seed to avoid caching
+            // Show loading
+            const loadId = showLoad("Painting...");
+            
+            // Generate URL
             const randomSeed = Math.floor(Math.random() * 1000000);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${randomSeed}&width=1024&height=1024&nologo=true`;
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${randomSeed}&width=768&height=768&nologo=true`;
 
-            // Wait 2 seconds just for effect, then force show the image
-            setTimeout(() => {
+            // PRE-LOAD IMAGE IN JAVASCRIPT
+            const imgObj = new Image();
+            
+            // 1. Success Handler
+            imgObj.onload = function() {
                 rmLoad(loadId);
                 const imageHtml = `
                     <div class="flex flex-col gap-2">
                         <span>Here is your image for: "<b>${prompt}</b>"</span>
                         <div class="relative group">
-                            <img src="${imageUrl}" class="rounded-xl shadow-lg w-full h-auto min-h-[200px] bg-white/5" loading="lazy" alt="Generated Image">
-                            <button onclick="downloadImage('${imageUrl}')" class="absolute bottom-3 right-3 bg-black/70 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-all shadow-xl border border-white/20">
+                            <img src="${imageUrl}" class="rounded-xl shadow-lg w-full h-auto min-h-[200px] bg-white/5" alt="Generated Image">
+                            <button onclick="downloadImage('${imageUrl}')" class="absolute bottom-3 right-3 bg-black/70 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-all shadow-xl border border-white/20 z-10">
                                 <i class="fas fa-download"></i>
                             </button>
                         </div>
                     </div>
                 `;
                 addMsg(imageHtml, 'bot');
-            }, 2000); 
+            };
+
+            // 2. Error Handler
+            imgObj.onerror = function() {
+                rmLoad(loadId);
+                addMsg(`Sorry, the image couldn't load due to network issues. <br><a href="${imageUrl}" target="_blank" class="text-cyan-400 underline font-bold mt-2 block">Click here to try viewing it directly</a>`, 'bot');
+            };
+
+            // 3. Start Loading
+            imgObj.src = imageUrl;
         }
 
-        // 🔥 NEW DOWNLOAD FUNCTION 🔥
+        // 🔥 SECURE DOWNLOAD FUNCTION 🔥
         async function downloadImage(url) {
             try {
                 const response = await fetch(url);
@@ -217,14 +229,14 @@
                 const blobUrl = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = blobUrl;
-                link.download = `noon-ai-image-${Date.now()}.png`;
+                link.download = `noon-ai-art-${Date.now()}.jpg`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(blobUrl);
-                toast(); // Show "Saved!"
+                toast(); 
             } catch (error) {
-                // Fallback if fetch fails (opens in new tab)
+                // If direct download fails (CORS), open in new tab
                 window.open(url, '_blank');
             }
         }
