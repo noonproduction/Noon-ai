@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,175 +9,329 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* ---- Custom Styles for Liquid Glass Effect ---- */
+        /* ---- CSS VARIABLES FOR THEMES ---- */
         :root {
-            --primary-glow: conic-gradient(from 180deg at 50% 50%, #16abff33 0deg, #0885ff33 55deg, #54d6ff33 120deg, #0071ff33 160deg, transparent 360deg);
-            --secondary-glow: radial-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --blob-1: rgba(37, 99, 235, 0.5);
+            --blob-2: rgba(147, 51, 234, 0.5);
+            --user-msg-bg: linear-gradient(135deg, #2563eb, #9333ea);
+            --user-text: #ffffff;
+            --bot-msg-bg: rgba(255, 255, 255, 0.08);
+            --bot-text: #e5e7eb;
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f4f8;
+            --text-color: #1f2937;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --blob-1: rgba(6, 182, 212, 0.3);
+            --blob-2: rgba(59, 130, 246, 0.3);
+            --user-msg-bg: linear-gradient(135deg, #06b6d4, #3b82f6);
+            --user-text: #ffffff;
+            --bot-msg-bg: rgba(255, 255, 255, 0.8);
+            --bot-text: #374151;
+            --input-bg: rgba(255, 255, 255, 0.9);
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #000;
-            color: white;
-            overflow: hidden; /* Prevent scrolling the background */
+            background: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.5s ease;
         }
 
-        /* Animated Liquid Background */
+        /* LIQUID BACKGROUND ANIMATION */
         .liquid-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -2;
+            z-index: -1;
             overflow: hidden;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
         }
         .blob {
             position: absolute;
             filter: blur(80px);
-            opacity: 0.6;
-            animation: move 20s infinite alternate;
+            border-radius: 50%;
+            animation: float 20s infinite alternate;
         }
         .blob-1 {
-            top: -10%; left: -10%; width: 50%; height: 50%;
-            background: rgba(37, 99, 235, 0.5);
+            top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: var(--blob-1);
             animation-duration: 25s;
         }
         .blob-2 {
-            bottom: -20%; right: -20%; width: 60%; height: 60%;
-            background: rgba(6, 182, 212, 0.4);
-            animation-duration: 30s;
+            bottom: -10%; right: -10%; width: 50vw; height: 50vw;
+            background: var(--blob-2);
             animation-delay: -5s;
         }
-        @keyframes move {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-            100% { transform: translate(20%, 20%) rotate(20deg) scale(1.2); }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
         }
 
-        /* Glassmorphism Panels */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
+        /* GLASS MORPHISM CLASSES */
+        .glass {
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
 
-        /* Header specific glass */
-        .glass-header {
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        /* Chat Bubbles */
-        .msg-bubble {
+        /* CHAT BUBBLES */
+        .msg {
             max-width: 85%;
-            padding: 14px 18px;
+            padding: 12px 16px;
+            margin-bottom: 15px;
             font-size: 0.95rem;
             line-height: 1.5;
             position: relative;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            opacity: 0;
-            transform: translateY(20px);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .user-msg {
             align-self: flex-end;
-            border-radius: 24px 24px 4px 24px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(147, 51, 234, 0.6));
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--user-msg-bg);
+            color: var(--user-text);
+            border-radius: 20px 20px 4px 20px;
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
         }
         .bot-msg {
             align-self: flex-start;
-            border-radius: 24px 24px 24px 4px;
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--bot-msg-bg);
+            color: var(--bot-text);
+            border-radius: 20px 20px 20px 4px;
+            border: 1px solid var(--glass-border);
         }
 
+        /* FEEDBACK BUTTONS */
+        .feedback-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+        .feedback-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+        .feedback-btn:hover { transform: scale(1.2); opacity: 1; }
+        .feedback-btn.active { opacity: 1; color: #22c55e; } /* Green for like */
+        .feedback-btn.dislike.active { color: #ef4444; } /* Red for dislike */
+
         @keyframes popIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Custom Scrollbar for Webkit */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
-
-        /* Input area glowing button */
-        .glow-btn {
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        /* TOAST NOTIFICATION */
+        #toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(16, 185, 129, 0.9); /* Green */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
             transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .glow-btn:hover { box-shadow: 0 0 25px rgba(6, 182, 212, 0.6); transform: scale(1.05); }
+        #toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* SETTINGS MODAL */
+        #settings-modal {
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.3); border-radius: 10px; }
     </style>
 </head>
-<body class="h-full flex flex-col">
+<body data-theme="dark">
 
     <div class="liquid-bg">
-        <div class="blob blob-1 rounded-full"></div>
-        <div class="blob blob-2 rounded-full"></div>
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
     </div>
 
-    <div class="flex-1 flex flex-col h-full max-w-md mx-auto w-full relative z-10">
-        
-        <div class="glass-header p-4 flex items-center gap-4 z-20">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <i class="fas fa-robot text-white text-lg"></i>
+    <div id="toast">
+        <i class="fas fa-check-circle"></i> Thanks for your feedback!
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass w-full max-w-sm rounded-3xl p-6 relative transform transition-all scale-95 opacity-0" id="settings-content">
+            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-lg">
+                    <i class="fas fa-robot text-white text-3xl"></i>
+                </div>
+                <h2 class="text-xl font-bold">Noon AI Pro</h2>
+                <p class="text-xs opacity-60">Version 1.0.5</p>
             </div>
-            <div>
-                <h1 class="font-semibold text-xl tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-200">Noon AI</h1>
-                <p class="text-xs text-cyan-300/70">Liquid Intelligence</p>
+
+            <div class="space-y-4">
+                <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                    <p class="text-xs text-gray-400 mb-1">Developer Contact</p>
+                    <p class="font-medium text-sm flex items-center gap-2">
+                        <i class="fas fa-envelope text-cyan-400"></i> connect.noonai@gmail.com
+                    </p>
+                </div>
+                
+                <div class="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center">
+                    <span class="text-sm">Dark Mode</span>
+                    <button onclick="toggleTheme()" class="w-10 h-6 rounded-full bg-white/20 relative transition-colors" id="theme-toggle-btn">
+                        <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform" id="theme-knob"></div>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center text-xs opacity-40">
+                Powered by Noon Production
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col h-full max-w-md mx-auto relative z-10">
+        
+        <div class="glass p-4 flex items-center justify-between z-20 mx-2 mt-2 rounded-2xl">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSettings()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-md">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Noon AI</h1>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        <span class="text-xs opacity-70">Online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:bg-white/10 transition">
+                    <i class="fas fa-moon" id="theme-icon"></i>
+                </button>
+                <button onclick="clearChat()" class="w-10 h-10 rounded-full glass flex items-center justify-center text-red-400 hover:bg-red-500/10 transition">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
 
-        <div id="chat-box" class="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col scroll-smooth">
-            <div class="msg-bubble bot-msg">
-                <i class="fas fa-sparkles text-cyan-400 mr-2"></i>
-                Hello! I'm Noon AI. How can I assist you today?
+        <div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col pt-6 pb-4">
+            <div class="bot-msg msg">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-sparkles text-cyan-400"></i>
+                    <span class="text-xs font-bold opacity-70">Noon AI</span>
+                </div>
+                Hello! I am Noon AI. How can I assist you today?
             </div>
         </div>
 
         <div class="p-4 z-20">
-            <div class="glass-panel rounded-[30px] p-2 pl-4 flex items-center gap-2 focus-within:border-cyan-400/50 transition-all">
+            <div class="glass p-2 pl-4 rounded-[25px] flex items-center gap-2">
+                <button class="w-8 h-8 flex items-center justify-center text-cyan-400 hover:bg-white/10 rounded-full transition">
+                    <i class="fas fa-plus"></i>
+                </button>
                 <form id="chat-form" class="flex-1 flex gap-2" onsubmit="sendMessage(event)">
                     <input type="text" id="msg-input" 
-                        class="w-full bg-transparent outline-none text-white placeholder-gray-400 font-light"
-                        placeholder="Type your message..." autocomplete="off">
+                        class="w-full bg-transparent outline-none placeholder-gray-400/70 font-light text-sm"
+                        style="color: var(--text-color);"
+                        placeholder="Type a message..." autocomplete="off">
                     <button type="submit" 
-                        class="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white glow-btn shrink-0">
-                        <i class="fas fa-paper-plane relative left-[1px]"></i>
+                        class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-105 transition transform">
+                        <i class="fas fa-paper-plane text-sm relative left-[1px]"></i>
                     </button>
                 </form>
             </div>
         </div>
-
     </div>
 
     <script>
-        // 🔥 Your Replit URL is ALREADY configured here!
-        const BACKEND_URL = "https://879a9d65-a264-4177-9167-2711221fa0f5-00-3j9ytr2tbdy5b.sisko.replit.dev/chat"; 
+        // 🔥 YOUR REPLIT URL
+        const BACKEND_URL = "https://879a9d65-a264-4177-9167-2711221fa0f5-00-3j9ytr2tbdy5b.sisko.replit.dev/chat";
 
+        // THEME HANDLING
+        let isDark = true;
+        
+        function toggleTheme() {
+            isDark = !isDark;
+            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            
+            // Update Icons
+            const icon = document.getElementById('theme-icon');
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun text-orange-400';
+            
+            // Update Toggle Switch
+            const knob = document.getElementById('theme-knob');
+            knob.style.transform = isDark ? 'translateX(0)' : 'translateX(100%)';
+            document.getElementById('theme-toggle-btn').style.backgroundColor = isDark ? 'rgba(255,255,255,0.2)' : '#3b82f6';
+        }
+
+        // SETTINGS MODAL HANDLING
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            const content = document.getElementById('settings-content');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        }
+
+        // CHAT LOGIC
         async function sendMessage(e) {
             e.preventDefault();
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
             if (!text) return;
 
-            // Add User Message
             addMessage(text, 'user');
             input.value = '';
 
-            // Add Loading Animation
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'msg-bubble bot-msg flex items-center gap-3';
-            loadingDiv.innerHTML = `
-                <i class="fas fa-circle-notch fa-spin text-cyan-400"></i>
-                <span class="text-gray-300 animate-pulse">Thinking...</span>
-            `;
-            document.getElementById('chat-box').appendChild(loadingDiv);
-            scrollToBottom();
+            // 🔥 IDENTITY CHECK (Client Side Override)
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes('who are you') || lowerText.includes('oyaa kawuda') || lowerText.includes('oya kawuda')) {
+                setTimeout(() => {
+                    addMessage("I am Noon AI, a smart assistant created by Noon Production.", 'bot');
+                }, 600);
+                return;
+            }
+
+            // Loading State
+            const loadingId = addLoading();
 
             try {
                 const response = await fetch(BACKEND_URL, {
@@ -187,36 +341,90 @@
                 });
                 const data = await response.json();
                 
-                loadingDiv.remove();
+                removeLoading(loadingId);
                 addMessage(data.reply, 'bot');
 
             } catch (error) {
-                loadingDiv.remove();
-                addMessage("Connection Error: Replit might be sleeping. Please try again in a minute.", 'bot');
+                removeLoading(loadingId);
+                addMessage("Server is sleeping... waking it up! Try again in 10s.", 'bot');
             }
         }
 
         function addMessage(text, sender) {
             const box = document.getElementById('chat-box');
             const div = document.createElement('div');
-            div.className = sender === 'user' ? 'msg-bubble user-msg' : 'msg-bubble bot-msg';
+            div.className = sender === 'user' ? 'user-msg msg' : 'bot-msg msg';
             
-            // Format Bold Text and Line Breaks
-            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b class="text-cyan-200">$1</b>').replace(/\n/g, '<br>');
+            let content = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
             
-            // Add icon for bot messages
+            // Add Header for Bot
             if (sender === 'bot') {
-                formattedText = '<i class="fas fa-sparkles text-cyan-400 mr-2 relative top-[1px]"></i>' + formattedText;
+                content = `
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-sparkles text-cyan-400"></i>
+                        <span class="text-xs font-bold opacity-70">Noon AI</span>
+                    </div>
+                    ${content}
+                    <div class="feedback-actions">
+                        <button class="feedback-btn" onclick="handleFeedback(this, 'like')"><i class="fas fa-thumbs-up"></i></button>
+                        <button class="feedback-btn dislike" onclick="handleFeedback(this, 'dislike')"><i class="fas fa-thumbs-down"></i></button>
+                    </div>
+                `;
             }
 
-            div.innerHTML = formattedText;
+            div.innerHTML = content;
             box.appendChild(div);
             scrollToBottom();
+        }
+
+        function addLoading() {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            const id = 'loading-' + Date.now();
+            div.id = id;
+            div.className = 'bot-msg msg flex items-center gap-2';
+            div.innerHTML = `<i class="fas fa-circle-notch fa-spin text-cyan-400"></i> Thinking...`;
+            box.appendChild(div);
+            scrollToBottom();
+            return id;
+        }
+
+        function removeLoading(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function clearChat() {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = `
+                <div class="bot-msg msg">
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fas fa-sparkles text-cyan-400"></i>
+                        <span class="text-xs font-bold opacity-70">Noon AI</span>
+                    </div>
+                    Chat cleared. How can I help?
+                </div>`;
         }
 
         function scrollToBottom() {
             const box = document.getElementById('chat-box');
             box.scrollTop = box.scrollHeight;
+        }
+
+        // FEEDBACK HANDLER
+        function handleFeedback(btn, type) {
+            // Visual Change
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('button');
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Show Toast
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
         }
     </script>
 </body>
