@@ -9,45 +9,82 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        :root { --bg-color: #000000; --text-color: #ffffff; --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.1); --user-msg-bg: linear-gradient(135deg, #2563eb, #9333ea); --bot-msg-bg: rgba(255, 255, 255, 0.1); --sidebar-bg: #0f0f10; }
-        [data-theme="light"] { --bg-color: #f0f4f8; --text-color: #1f2937; --glass-bg: rgba(255, 255, 255, 0.6); --glass-border: rgba(255, 255, 255, 0.4); --user-msg-bg: linear-gradient(135deg, #06b6d4, #3b82f6); --bot-msg-bg: #ffffff; --sidebar-bg: #ffffff; }
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --user-msg-bg: linear-gradient(135deg, #2563eb, #9333ea);
+            --bot-msg-bg: rgba(255, 255, 255, 0.1);
+            --sidebar-bg: #0f0f10;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f0f4f8;
+            --text-color: #1f2937;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --user-msg-bg: linear-gradient(135deg, #06b6d4, #3b82f6);
+            --bot-msg-bg: #ffffff;
+            --sidebar-bg: #ffffff;
+        }
+
         html, body { height: 100dvh; overflow: hidden; font-family: 'Poppins', sans-serif; background: var(--bg-color); color: var(--text-color); transition: background 0.3s; margin: 0; }
         .safe-area-top { padding-top: max(10px, env(safe-area-inset-top)); }
         .safe-area-bottom { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
-        #onboarding-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg-color); display: flex; flex-direction: column; transition: opacity 0.5s; visibility: visible; }
-        #onboarding-overlay.hidden-all { display: none !important; visibility: hidden; }
+
+        #onboarding-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg-color); display: flex; flex-direction: column; transition: opacity 0.5s; }
+        #onboarding-overlay.hidden-anim { opacity: 0; pointer-events: none; }
         .slide { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px; animation: fadeIn 0.5s; }
         .slide.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         #app-wrapper { display: flex; height: 100%; width: 100%; overflow: hidden; }
         #sidebar { width: 280px; background: var(--sidebar-bg); height: 100%; position: absolute; left: -280px; top: 0; z-index: 50; transition: transform 0.3s ease; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
         #sidebar.open { transform: translateX(280px); box-shadow: 5px 0 30px rgba(0,0,0,0.5); }
-        .history-item { padding: 12px; margin: 5px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; opacity: 0.7; }
-        .history-item.active { background: var(--glass-bg); opacity: 1; }
+        .history-item { padding: 12px; margin: 5px 10px; border-radius: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; opacity: 0.7; }
+        .history-item:hover, .history-item.active { background: var(--glass-bg); opacity: 1; }
+        
         #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 40; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
         #overlay.show { opacity: 1; pointer-events: auto; }
+
         #main-chat { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 10; height: 100%; }
+
         .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); }
         .msg { max-width: 85%; padding: 12px 16px; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; border-radius: 18px; word-wrap: break-word; }
         .user-msg { align-self: flex-end; background: var(--user-msg-bg); color: white; border-bottom-right-radius: 4px; }
         .bot-msg { align-self: flex-start; background: var(--bot-msg-bg); color: var(--text-color); border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
+        .msg img { max-width: 100%; border-radius: 12px; margin-top: 8px; }
+
         #toast { position: fixed; top: 80px; left: 50%; transform: translate(-50%, -20px); background: #10b981; color: white; padding: 8px 16px; border-radius: 50px; opacity: 0; transition: 0.3s; z-index: 100; pointer-events: none; }
         #toast.show { opacity: 1; transform: translate(-50%, 0); }
     </style>
 </head>
 <body data-theme="dark">
 
-    <div id="onboarding-overlay">
+    <div id="onboarding-overlay" class="hidden">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-1]">
+             <div class="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] bg-blue-600/30 blur-[80px] rounded-full animate-pulse"></div>
+             <div class="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-purple-600/30 blur-[80px] rounded-full animate-pulse"></div>
+        </div>
         <div class="slide active" id="slide-1">
+            <div class="w-24 h-24 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-sparkles text-4xl text-white"></i></div>
             <h1 class="text-3xl font-bold mb-4">Welcome to Noon AI</h1>
-            <p class="opacity-70 px-6">Smart, Fast & Secure AI Assistant.</p>
+            <p class="text-lg opacity-70 px-6">Experience the power of advanced AI right in your pocket.</p>
         </div>
         <div class="slide" id="slide-2">
-            <h1 class="text-3xl font-bold mb-4">Image Magic</h1>
-            <p class="opacity-70 px-6">Create stunning images with words.</p>
+            <div class="w-24 h-24 bg-gradient-to-tr from-purple-400 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-eye text-4xl text-white"></i></div>
+            <h1 class="text-3xl font-bold mb-4">Vision Capabilities</h1>
+            <p class="text-lg opacity-70 px-6">Send photos and let Noon AI analyze them.</p>
+        </div>
+        <div class="slide" id="slide-3">
+            <div class="w-24 h-24 bg-gradient-to-tr from-green-400 to-emerald-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-palette text-4xl text-white"></i></div>
+            <h1 class="text-3xl font-bold mb-4">Image Generation</h1>
+            <p class="text-lg opacity-70 px-6">Ask Noon AI to draw anything for you!</p>
         </div>
         <div class="w-full p-8 mt-auto safe-area-bottom">
-            <button onclick="nextSlide()" id="next-btn" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl shadow-lg transition">Next</button>
+            <button onclick="nextSlide()" id="next-btn" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl shadow-lg active:scale-95 transition">Next</button>
+            <button onclick="skipOnboarding()" class="w-full text-center mt-4 opacity-50 text-sm p-2">Skip</button>
         </div>
     </div>
 
@@ -55,36 +92,54 @@
 
     <div id="app-wrapper">
         <div id="sidebar">
-            <div class="p-4 safe-area-top"><button onclick="startNewChat()" class="w-full glass p-3 rounded-xl flex items-center gap-3"><i class="fas fa-plus text-cyan-400"></i><span>New Chat</span></button></div>
-            <div id="history-list" class="flex-1 overflow-y-auto"></div>
-            <div class="p-4 border-t border-white/10"><button onclick="toggleSettings()" class="flex items-center gap-3 opacity-70 w-full"><i class="fas fa-cog"></i> Settings</button></div>
+            <div class="p-4 safe-area-top">
+                <button onclick="startNewChat()" class="w-full glass p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition group">
+                    <i class="fas fa-plus text-cyan-400 group-hover:scale-110 transition"></i>
+                    <span class="font-medium">New Chat</span>
+                </button>
+            </div>
+            <div class="px-4 pb-2 text-xs font-bold opacity-50 uppercase tracking-wider">Recent</div>
+            <div class="flex-1 overflow-y-auto" id="history-list"></div>
+            <div class="p-4 border-t border-white/10">
+                <button onclick="toggleSettings()" class="flex items-center gap-3 opacity-70 hover:opacity-100 transition p-2 w-full"><i class="fas fa-cog"></i> Settings</button>
+            </div>
         </div>
 
         <div id="main-chat">
             <div class="glass flex items-center justify-between px-4 py-3 m-2 rounded-2xl shadow-lg z-20 safe-area-top shrink-0">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSidebar()">
-                    <i class="fas fa-bars opacity-80"></i>
-                    <img src="./IMG-20260206-WA0016.jpg" class="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 border border-white/10" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
-                    <h1 class="font-bold text-lg">Noon AI</h1>
+                    <i class="fas fa-bars text-xl opacity-80"></i>
+                    <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 border border-white/10">
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight">Noon AI</h1>
+                        <div class="flex items-center gap-1.5"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span><span class="text-[10px] font-medium opacity-70">PRO</span></div>
+                    </div>
                 </div>
-                <button onclick="toggleTheme()" class="w-9 h-9 rounded-full glass flex items-center justify-center"><i class="fas fa-moon" id="theme-icon"></i></button>
+                <div class="flex gap-2">
+                    <button onclick="toggleTheme()" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10"><i class="fas fa-moon" id="theme-icon"></i></button>
+                </div>
             </div>
 
-            <div id="chat-box" class="flex-1 overflow-y-auto px-4 py-2 flex flex-col"></div>
+            <div id="chat-box" class="flex-1 overflow-y-auto px-4 py-2 flex flex-col scroll-smooth"></div>
 
-            <div id="image-preview" class="hidden px-4 py-2 mx-4 mb-2 bg-black/40 rounded-xl flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-3"><img id="preview-img" class="w-10 h-10 rounded-lg object-cover"><span>Attached</span></div>
-                <button onclick="removeImage()"><i class="fas fa-times"></i></button>
+            <div id="image-preview" class="hidden px-4 py-2 mx-4 mb-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <img id="preview-img" src="" class="w-10 h-10 rounded-lg object-cover border border-white/20">
+                    <span class="text-xs opacity-80">Photo attached</span>
+                </div>
+                <button onclick="removeImage()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
 
             <div class="p-3 z-20 safe-area-bottom shrink-0">
-                <div class="glass p-1.5 pl-2 rounded-[28px] flex items-center gap-2">
+                <div class="glass p-1.5 pl-2 rounded-[28px] flex items-center gap-2 shadow-xl">
                     <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleImage(event)">
-                    <button onclick="document.getElementById('image-input').click()" class="w-10 h-10 text-cyan-400"><i class="fas fa-plus"></i></button>
-                    <button onclick="generateImage(event)" class="w-10 h-10 text-purple-400"><i class="fas fa-palette"></i></button>
+                    
+                    <button onclick="document.getElementById('image-input').click()" class="w-10 h-10 flex items-center justify-center text-cyan-400 hover:bg-white/10 rounded-full transition active:scale-90"><i class="fas fa-plus text-lg"></i></button>
+                    <button onclick="generateImage(event)" class="w-10 h-10 flex items-center justify-center text-purple-400 hover:bg-white/10 rounded-full transition active:scale-90"><i class="fas fa-palette text-lg"></i></button>
+
                     <form class="flex-1 flex gap-2" onsubmit="sendMessage(event)">
-                        <input type="text" id="msg-input" class="w-full bg-transparent outline-none text-sm px-2" placeholder="Message Noon AI..." autocomplete="off">
-                        <button type="submit" class="w-10 h-10 bg-blue-600 rounded-full text-white"><i class="fas fa-paper-plane"></i></button>
+                        <input type="text" id="msg-input" class="w-full bg-transparent outline-none text-sm px-2" style="color: var(--text-color);" placeholder="Message Noon AI..." autocomplete="off">
+                        <button type="submit" class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fas fa-paper-plane text-sm translate-x-px translate-y-px"></i></button>
                     </form>
                 </div>
             </div>
@@ -92,104 +147,139 @@
     </div>
 
     <div id="settings-modal" class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass w-full max-w-sm rounded-3xl p-6 relative" id="settings-content">
-            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+        <div class="glass w-full max-w-sm rounded-3xl p-6 transform scale-95 opacity-0 transition-all duration-300 relative" id="settings-content">
+            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400 p-2"><i class="fas fa-times"></i></button>
+            <div class="text-center">
+                <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-16 h-16 rounded-xl mx-auto mb-2 shadow-lg object-contain bg-white/10 p-1">
+                <h2 class="text-xl font-bold">Noon AI Pro</h2>
+                <p class="text-xs opacity-60">Version 4.8 (Stable Gen)</p>
+            </div>
             <div class="mt-4 space-y-2">
-                <button onclick="resetOnboarding()" class="w-full p-3 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">Reset Onboarding</button>
-                <button onclick="clearAllHistory()" class="w-full p-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">Clear History</button>
+                <button onclick="resetOnboarding()" class="w-full p-3 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-3"><i class="fas fa-redo"></i> Reset Onboarding</button>
+                <button onclick="clearAllHistory()" class="w-full p-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-3"><i class="fas fa-trash"></i> Delete All History</button>
+                <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-center text-xs opacity-70">connect.noonai@gmail.com</div>
             </div>
         </div>
     </div>
-    <div id="toast">Saved!</div>
+    <div id="toast"><i class="fas fa-check-circle mr-2"></i> Saved!</div>
 
     <script>
         const BACKEND_URL = "https://879a9d65-a264-4177-9167-2711221fa0f5-00-3j9ytr2tbdy5b.sisko.replit.dev/chat";
-        let isDark = true; imgData = null; sessions = []; currentSessionId = null; currentSlide = 1;
+        let isDark = true; imgData = null; sessions = []; currentSessionId = null;
+        currentSlide = 1; totalSlides = 3;
 
-        // 🔥 FIXED ONBOARDING CHECK
         window.onload = function() {
-            const isComplete = localStorage.getItem('noon_v3_onboarding');
-            if (isComplete === 'true') {
-                document.getElementById('onboarding-overlay').classList.add('hidden-all');
-            }
+            if (!localStorage.getItem('noon_onboarding_complete')) document.getElementById('onboarding-overlay').classList.remove('hidden');
             loadSessions();
+            if(localStorage.getItem('noon_theme') === 'light') toggleTheme();
         };
 
-        function nextSlide() {
-            if (currentSlide < 2) {
-                document.getElementById(`slide-${currentSlide}`).classList.remove('active');
-                currentSlide++;
-                document.getElementById(`slide-${currentSlide}`).classList.add('active');
-                document.getElementById('next-btn').innerText = "Get Started";
-            } else {
-                localStorage.setItem('noon_v3_onboarding', 'true');
-                document.getElementById('onboarding-overlay').style.opacity = '0';
-                setTimeout(() => document.getElementById('onboarding-overlay').classList.add('hidden-all'), 500);
-            }
-        }
-
+        // 🔥 ROCK SOLID IMAGE GENERATION LOGIC 🔥
         async function generateImage(e) {
             e.preventDefault();
             const input = document.getElementById('msg-input');
             const prompt = input.value.trim();
-            if (!prompt) return;
+            if (!prompt) { alert("Type what you want to draw first!"); return; }
+
             addMsg(`🎨 Generate: "${prompt}"`, 'user');
             input.value = '';
-            const loadId = showLoad("Painting...");
-            const seed = Math.floor(Math.random() * 100000);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=720&height=720&nologo=true`;
             
-            // 🔥 DIRECT LOAD FIX
-            const img = new Image();
-            img.onload = () => {
+            // Show loading
+            const loadId = showLoad("Painting...");
+            
+            // Generate URL
+            const randomSeed = Math.floor(Math.random() * 1000000);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${randomSeed}&width=768&height=768&nologo=true`;
+
+            // PRE-LOAD IMAGE IN JAVASCRIPT
+            const imgObj = new Image();
+            
+            // 1. Success Handler
+            imgObj.onload = function() {
                 rmLoad(loadId);
-                const html = `Image: <b>${prompt}</b><br><div class='relative'><img src='${imageUrl}' class='rounded-xl mt-2'><button onclick="downloadImage('${imageUrl}')" class='absolute bottom-2 right-2 bg-black/50 p-2 rounded-full'><i class='fas fa-download'></i></button></div>`;
-                addMsg(html, 'bot');
+                const imageHtml = `
+                    <div class="flex flex-col gap-2">
+                        <span>Here is your image for: "<b>${prompt}</b>"</span>
+                        <div class="relative group">
+                            <img src="${imageUrl}" class="rounded-xl shadow-lg w-full h-auto min-h-[200px] bg-white/5" alt="Generated Image">
+                            <button onclick="downloadImage('${imageUrl}')" class="absolute bottom-3 right-3 bg-black/70 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-all shadow-xl border border-white/20 z-10">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                addMsg(imageHtml, 'bot');
             };
-            img.onerror = () => {
+
+            // 2. Error Handler
+            imgObj.onerror = function() {
                 rmLoad(loadId);
-                addMsg(`Failed to load. <a href='${imageUrl}' target='_blank' class='text-blue-400 underline'>Click here to see it</a>`, 'bot');
+                addMsg(`Sorry, the image couldn't load due to network issues. <br><a href="${imageUrl}" target="_blank" class="text-cyan-400 underline font-bold mt-2 block">Click here to try viewing it directly</a>`, 'bot');
             };
-            img.src = imageUrl;
+
+            // 3. Start Loading
+            imgObj.src = imageUrl;
         }
 
+        // 🔥 SECURE DOWNLOAD FUNCTION 🔥
         async function downloadImage(url) {
-            window.open(url, '_blank');
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = `noon-ai-art-${Date.now()}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+                toast(); 
+            } catch (error) {
+                // If direct download fails (CORS), open in new tab
+                window.open(url, '_blank');
+            }
         }
 
-        function loadSessions() {
-            const saved = localStorage.getItem('noon_sessions');
-            if (saved) { sessions = JSON.parse(saved); if (sessions.length > 0) loadChat(sessions[0].id); else startNewChat(); }
-            else startNewChat();
-            renderSidebar();
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+                currentSlide++;
+                document.getElementById(`slide-${currentSlide}`).classList.add('active');
+                if (currentSlide === totalSlides) document.getElementById('next-btn').innerText = "Get Started";
+            } else finishOnboarding();
         }
-        function startNewChat() { const id = Date.now().toString(); sessions.unshift({id, title: "New Chat", messages: [{html: "Hello! How can I help?", role: "bot"}]}); currentSessionId = id; saveSessions(); renderChat(sessions[0].messages); renderSidebar(); closeSidebar(); }
-        function loadChat(id) { currentSessionId = id; const s = sessions.find(x => x.id === id); if(s) { renderChat(s.messages); renderSidebar(); closeSidebar(); } }
+        function finishOnboarding() { localStorage.setItem('noon_onboarding_complete', 'true'); const ov = document.getElementById('onboarding-overlay'); ov.classList.add('hidden-anim'); setTimeout(() => ov.classList.add('hidden'), 500); }
+        function skipOnboarding() { finishOnboarding(); }
+        function resetOnboarding() { localStorage.removeItem('noon_onboarding_complete'); location.reload(); }
+
+        function loadSessions() { const saved = localStorage.getItem('noon_sessions'); if (saved) { sessions = JSON.parse(saved); if (sessions.length > 0) loadChat(sessions[0].id); else startNewChat(); } else startNewChat(); renderSidebar(); }
+        function startNewChat() { const newId = Date.now().toString(); const newSession = { id: newId, title: "New Chat", messages: [{ html: "Hello! How can I help you today?", role: "bot" }] }; sessions.unshift(newSession); currentSessionId = newId; saveSessions(); renderSidebar(); renderChat(newSession.messages); closeSidebar(); }
+        function loadChat(id) { currentSessionId = id; const session = sessions.find(s => s.id === id); if (session) { renderChat(session.messages); renderSidebar(); closeSidebar(); } }
+        function deleteSession(e, id) { e.stopPropagation(); if(confirm("Delete this chat?")) { sessions = sessions.filter(s => s.id !== id); saveSessions(); if(sessions.length === 0) startNewChat(); else if(currentSessionId === id) loadChat(sessions[0].id); else renderSidebar(); } }
         function saveSessions() { localStorage.setItem('noon_sessions', JSON.stringify(sessions)); }
-        function renderSidebar() { const list = document.getElementById('history-list'); list.innerHTML = sessions.map(s => `<div class='history-item ${s.id === currentSessionId ? 'active' : ''}' onclick="loadChat('${s.id}')"><i class='fas fa-message'></i> <span class='truncate'>${s.title}</span></div>`).join(''); }
-        function renderChat(msgs) { document.getElementById('chat-box').innerHTML = msgs.map(m => `<div class='msg ${m.role === 'user' ? 'user-msg' : 'bot-msg'}'>${m.html}</div>`).join(''); document.getElementById('chat-box').scrollTop = 99999; }
+        function renderSidebar() { const list = document.getElementById('history-list'); list.innerHTML = ''; sessions.forEach(s => { const isActive = s.id === currentSessionId ? 'active' : ''; const div = document.createElement('div'); div.className = `history-item ${isActive}`; div.onclick = () => loadChat(s.id); div.innerHTML = `<i class="fas fa-message text-cyan-400"></i><span class="flex-1 truncate">${s.title}</span><button onclick="deleteSession(event, '${s.id}')" class="opacity-50 hover:text-red-400 p-1"><i class="fas fa-trash"></i></button>`; list.appendChild(div); }); }
+        function renderChat(messages) { const box = document.getElementById('chat-box'); box.innerHTML = ''; messages.forEach(msg => addMsgToUI(msg.html, msg.role, false)); box.scrollTop = box.scrollHeight; }
+
         async function sendMessage(e) {
             e.preventDefault(); const input = document.getElementById('msg-input'); const text = input.value.trim(); if (!text && !imgData) return;
-            const session = sessions.find(s => s.id === currentSessionId);
-            if(session.messages.length === 1 && text) session.title = text.slice(0, 20);
-            let html = text + (imgData ? `<br><img src='${imgData}' class='rounded-lg'>` : '');
-            addMsg(html, 'user'); input.value = ''; const toSendImg = imgData; removeImage(); const loadId = showLoad();
-            try {
-                const res = await fetch(BACKEND_URL, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: text, image: toSendImg}) });
-                const data = await res.json(); rmLoad(loadId); addMsg(data.reply, 'bot');
-            } catch { rmLoad(loadId); addMsg("Server busy. Try again.", 'bot'); }
+            const session = sessions.find(s => s.id === currentSessionId); if (session.messages.length <= 1 && text) { session.title = text.substring(0, 20) + (text.length > 20 ? "..." : ""); renderSidebar(); }
+            let displayHtml = text; if (imgData) displayHtml += `<br><img src="${imgData}">`;
+            addMsg(displayHtml, 'user'); input.value = ''; const toSendImg = imgData; removeImage(); const loadId = showLoad();
+            try { const res = await fetch(BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message: text, image: toSendImg }) }); const data = await res.json(); rmLoad(loadId); addMsg(data.reply, 'bot'); } catch { rmLoad(loadId); addMsg("Brain is sleeping... Waking up! Try again in 10s.", 'bot'); }
         }
-        function addMsg(html, role) { const s = sessions.find(x => x.id === currentSessionId); s.messages.push({html, role}); saveSessions(); renderChat(s.messages); }
-        function showLoad(t="Thinking...") { const id = 'l-'+Date.now(); document.getElementById('chat-box').innerHTML += `<div id='${id}' class='msg bot-msg opacity-50'><i class='fas fa-circle-notch fa-spin'></i> ${t}</div>`; return id; }
-        function rmLoad(id) { document.getElementById(id)?.remove(); }
-        function resetOnboarding() { localStorage.removeItem('noon_v3_onboarding'); location.reload(); }
-        function clearAllHistory() { localStorage.removeItem('noon_sessions'); sessions = []; startNewChat(); }
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+        function addMsg(html, role) { const session = sessions.find(s => s.id === currentSessionId); if(session) { session.messages.push({ html: html, role: role }); saveSessions(); } addMsgToUI(html, role, true); }
+        function addMsgToUI(html, role, scroll) { const box = document.getElementById('chat-box'); const div = document.createElement('div'); div.className = role === 'user' ? 'user-msg msg' : 'bot-msg msg'; if (role === 'bot') { html = `<div class="flex items-center gap-2 mb-1 text-cyan-400 font-bold text-xs"><i class="fas fa-robot"></i> Noon AI</div>` + html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>') + `<div class="flex gap-4 mt-2 pt-2 border-t border-white/10 opacity-50"><button onclick="toast()" class="hover:text-green-400"><i class="fas fa-thumbs-up"></i></button><button onclick="toast()" class="hover:text-red-400"><i class="fas fa-thumbs-down"></i></button></div>`; } div.innerHTML = html; box.appendChild(div); if(scroll) box.scrollTop = box.scrollHeight; }
+        function toggleSidebar() { const sb = document.getElementById('sidebar'); const ov = document.getElementById('overlay'); if(sb.classList.contains('open')) { sb.classList.remove('open'); ov.classList.remove('show'); } else { sb.classList.add('open'); ov.classList.add('show'); } }
         function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
-        function toggleTheme() { isDark = !isDark; document.body.setAttribute('data-theme', isDark ? 'dark' : 'light'); }
-        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function handleImage(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = (x) => { imgData = x.target.result; document.getElementById('preview-img').src = imgData; document.getElementById('image-preview').classList.remove('hidden'); }; r.readAsDataURL(f); }
-        function removeImage() { imgData = null; document.getElementById('image-preview').classList.add('hidden'); }
+        function toggleTheme() { isDark = !isDark; document.body.setAttribute('data-theme', isDark ? 'dark' : 'light'); document.getElementById('theme-icon').className = isDark ? 'fas fa-moon' : 'fas fa-sun text-orange-400'; localStorage.setItem('noon_theme', isDark ? 'dark' : 'light'); }
+        function toggleSettings() { const m = document.getElementById('settings-modal'); const c = document.getElementById('settings-content'); if (m.classList.contains('hidden')) { m.classList.remove('hidden'); setTimeout(() => { c.classList.remove('scale-95','opacity-0'); c.classList.add('scale-100','opacity-100'); }, 10); } else { c.classList.remove('scale-100','opacity-100'); c.classList.add('scale-95','opacity-0'); setTimeout(() => m.classList.add('hidden'), 300); } closeSidebar(); }
+        function clearAllHistory() { if(confirm("Delete ALL chats?")) { localStorage.removeItem('noon_sessions'); sessions = []; startNewChat(); toggleSettings(); } }
+        function handleImage(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (e) => { imgData = e.target.result; document.getElementById('preview-img').src = imgData; document.getElementById('image-preview').classList.remove('hidden'); document.getElementById('image-preview').classList.add('flex'); }; reader.readAsDataURL(file); }
+        function removeImage() { imgData = null; document.getElementById('image-input').value = ''; document.getElementById('image-preview').classList.add('hidden'); document.getElementById('image-preview').classList.remove('flex'); }
+        function showLoad(text="Thinking...") { const id = 'l-' + Date.now(); const box = document.getElementById('chat-box'); const div = document.createElement('div'); div.id = id; div.className = 'bot-msg msg flex items-center gap-2 text-gray-400'; div.innerHTML = `<i class="fas fa-circle-notch fa-spin text-cyan-400"></i> ${text}`; box.appendChild(div); box.scrollTop = box.scrollHeight; return id; }
+        function rmLoad(id) { document.getElementById(id)?.remove(); }
+        function toast() { const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
     </script>
 </body>
 </html>
