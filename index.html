@@ -32,10 +32,9 @@
             --bot-msg-bg: #ffffff;
         }
 
-        /* FULL SCREEN FIXES */
         html, body {
             height: 100%;
-            height: 100dvh; /* Dynamic height for mobile browsers */
+            height: 100dvh;
             overflow: hidden;
             margin: 0;
             padding: 0;
@@ -45,11 +44,9 @@
             transition: background 0.3s;
         }
 
-        /* SAFE AREA PADDING (Notch & Home Bar fix) */
         .safe-area-top { padding-top: max(12px, env(safe-area-inset-top)); }
         .safe-area-bottom { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 
-        /* LAYOUT STRUCTURE */
         #app-container {
             display: flex;
             flex-direction: column;
@@ -60,14 +57,12 @@
             z-index: 10;
         }
 
-        /* LIQUID BACKGROUND */
         .liquid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .blob { position: absolute; filter: blur(70px); border-radius: 50%; animation: float 10s infinite alternate; }
         .blob-1 { top: -10%; left: -10%; width: 70vw; height: 70vw; background: var(--blob-1); }
         .blob-2 { bottom: -10%; right: -10%; width: 70vw; height: 70vw; background: var(--blob-2); animation-delay: -5s; }
         @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(20px, 40px); } }
 
-        /* GLASS CARD */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
@@ -75,17 +70,14 @@
             border: 1px solid var(--glass-border);
         }
 
-        /* CHAT BUBBLES */
         .msg { max-width: 85%; padding: 12px 16px; margin-bottom: 12px; font-size: 0.95rem; line-height: 1.5; border-radius: 18px; word-wrap: break-word; }
         .user-msg { align-self: flex-end; background: var(--user-msg-bg); color: white; border-bottom-right-radius: 4px; }
         .bot-msg { align-self: flex-start; background: var(--bot-msg-bg); color: var(--text-color); border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
         .msg img { max-width: 100%; border-radius: 12px; margin-top: 8px; display: block; }
 
-        /* TOAST */
         #toast { position: fixed; top: 100px; left: 50%; transform: translate(-50%, -20px); background: #10b981; color: white; padding: 10px 20px; border-radius: 50px; opacity: 0; transition: 0.3s; z-index: 50; pointer-events: none; font-size: 0.9rem; white-space: nowrap; }
         #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-        /* SETTINGS MODAL */
         #settings-modal { transition: 0.2s; }
     </style>
 </head>
@@ -98,7 +90,7 @@
         <div class="glass w-full max-w-sm rounded-3xl p-6 transform scale-95 opacity-0 transition-all duration-300" id="settings-content">
             <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400 p-2"><i class="fas fa-times text-xl"></i></button>
             <div class="text-center">
-                <img src="./logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-20 h-20 rounded-2xl mx-auto mb-3 shadow-lg object-contain bg-white/10 p-1">
+                <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-20 h-20 rounded-2xl mx-auto mb-3 shadow-lg object-contain bg-white/10 p-1">
                 <h2 class="text-xl font-bold">Noon AI Pro</h2>
                 <p class="text-xs opacity-60 mt-1">Version 2.0</p>
             </div>
@@ -118,7 +110,7 @@
         
         <div class="glass flex items-center justify-between px-4 py-3 m-2 rounded-2xl shadow-lg z-20 safe-area-top shrink-0">
             <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSettings()">
-                <img src="./logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-10 h-10 rounded-xl object-contain bg-white/10 p-0.5 border border-white/10">
+                <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-10 h-10 rounded-xl object-contain bg-white/10 p-0.5 border border-white/10">
                 <div>
                     <h1 class="font-bold text-lg leading-tight">Noon AI</h1>
                     <div class="flex items-center gap-1.5"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span><span class="text-[10px] font-medium opacity-70 uppercase tracking-wide">Online</span></div>
@@ -222,7 +214,6 @@
             removeImage();
             const loadId = showLoad();
 
-            // Identity Check
             if (text.toLowerCase().match(/who are you|oyaa kawuda|kawuda oya/)) {
                 setTimeout(() => { rmLoad(loadId); addMsg("I am Noon AI, a smart assistant by Noon Production.", 'bot'); }, 500);
                 return;
