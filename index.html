@@ -1,37 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Noon AI</title>
+    <title>Noon AI Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        body { background: #0f0f1a; color: white; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .user-msg { background: #2563eb; align-self: flex-end; border-radius: 18px 18px 0 18px; color: white; }
-        .bot-msg { background: rgba(255, 255, 255, 0.1); align-self: flex-start; border-radius: 18px 18px 18px 0; color: #e5e7eb; }
+        /* ---- Custom Styles for Liquid Glass Effect ---- */
+        :root {
+            --primary-glow: conic-gradient(from 180deg at 50% 50%, #16abff33 0deg, #0885ff33 55deg, #54d6ff33 120deg, #0071ff33 160deg, transparent 360deg);
+            --secondary-glow: radial-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden; /* Prevent scrolling the background */
+        }
+
+        /* Animated Liquid Background */
+        .liquid-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+        }
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: move 20s infinite alternate;
+        }
+        .blob-1 {
+            top: -10%; left: -10%; width: 50%; height: 50%;
+            background: rgba(37, 99, 235, 0.5);
+            animation-duration: 25s;
+        }
+        .blob-2 {
+            bottom: -20%; right: -20%; width: 60%; height: 60%;
+            background: rgba(6, 182, 212, 0.4);
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+        @keyframes move {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            100% { transform: translate(20%, 20%) rotate(20deg) scale(1.2); }
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Header specific glass */
+        .glass-header {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Chat Bubbles */
+        .msg-bubble {
+            max-width: 85%;
+            padding: 14px 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .user-msg {
+            align-self: flex-end;
+            border-radius: 24px 24px 4px 24px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(147, 51, 234, 0.6));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+        }
+        .bot-msg {
+            align-self: flex-start;
+            border-radius: 24px 24px 24px 4px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @keyframes popIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar for Webkit */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+
+        /* Input area glowing button */
+        .glow-btn {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glow-btn:hover { box-shadow: 0 0 25px rgba(6, 182, 212, 0.6); transform: scale(1.05); }
     </style>
 </head>
-<body>
+<body class="h-full flex flex-col">
 
-    <div class="glass p-4 flex items-center gap-3">
-        <h1 class="font-bold text-lg text-cyan-400">Noon AI</h1>
+    <div class="liquid-bg">
+        <div class="blob blob-1 rounded-full"></div>
+        <div class="blob blob-2 rounded-full"></div>
     </div>
 
-    <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
-        <div class="bot-msg p-3 max-w-[85%]">Hello! I am Noon AI. Ask me anything!</div>
-    </div>
+    <div class="flex-1 flex flex-col h-full max-w-md mx-auto w-full relative z-10">
+        
+        <div class="glass-header p-4 flex items-center gap-4 z-20">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
+                <i class="fas fa-robot text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-semibold text-xl tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-200">Noon AI</h1>
+                <p class="text-xs text-cyan-300/70">Liquid Intelligence</p>
+            </div>
+        </div>
 
-    <div class="p-4 glass">
-        <form id="chat-form" class="flex gap-2" onsubmit="sendMessage(event)">
-            <input type="text" id="msg-input" class="w-full bg-gray-800 rounded-full px-4 py-3 outline-none text-white" placeholder="Message..." autocomplete="off">
-            <button type="submit" class="w-12 h-12 bg-cyan-600 rounded-full text-white"><i class="fas fa-paper-plane"></i></button>
-        </form>
+        <div id="chat-box" class="flex-1 overflow-y-auto p-5 space-y-6 flex flex-col scroll-smooth">
+            <div class="msg-bubble bot-msg">
+                <i class="fas fa-sparkles text-cyan-400 mr-2"></i>
+                Hello! I'm Noon AI. How can I assist you today?
+            </div>
+        </div>
+
+        <div class="p-4 z-20">
+            <div class="glass-panel rounded-[30px] p-2 pl-4 flex items-center gap-2 focus-within:border-cyan-400/50 transition-all">
+                <form id="chat-form" class="flex-1 flex gap-2" onsubmit="sendMessage(event)">
+                    <input type="text" id="msg-input" 
+                        class="w-full bg-transparent outline-none text-white placeholder-gray-400 font-light"
+                        placeholder="Type your message..." autocomplete="off">
+                    <button type="submit" 
+                        class="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white glow-btn shrink-0">
+                        <i class="fas fa-paper-plane relative left-[1px]"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // 🔥 Updated Link Added Here!
+        // 🔥 Your Replit URL is ALREADY configured here!
         const BACKEND_URL = "https://879a9d65-a264-4177-9167-2711221fa0f5-00-3j9ytr2tbdy5b.sisko.replit.dev/chat"; 
 
         async function sendMessage(e) {
@@ -40,13 +165,19 @@
             const text = input.value.trim();
             if (!text) return;
 
+            // Add User Message
             addMessage(text, 'user');
             input.value = '';
 
-            const loading = document.createElement('div');
-            loading.className = 'bot-msg p-3 text-gray-400';
-            loading.innerText = 'Thinking...';
-            document.getElementById('chat-box').appendChild(loading);
+            // Add Loading Animation
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'msg-bubble bot-msg flex items-center gap-3';
+            loadingDiv.innerHTML = `
+                <i class="fas fa-circle-notch fa-spin text-cyan-400"></i>
+                <span class="text-gray-300 animate-pulse">Thinking...</span>
+            `;
+            document.getElementById('chat-box').appendChild(loadingDiv);
+            scrollToBottom();
 
             try {
                 const response = await fetch(BACKEND_URL, {
@@ -55,20 +186,36 @@
                     body: JSON.stringify({ message: text })
                 });
                 const data = await response.json();
-                loading.remove();
+                
+                loadingDiv.remove();
                 addMessage(data.reply, 'bot');
+
             } catch (error) {
-                loading.remove();
-                addMessage("Connection Error: Replit might be sleeping. Wake it up!", 'bot');
+                loadingDiv.remove();
+                addMessage("Connection Error: Replit might be sleeping. Please try again in a minute.", 'bot');
             }
         }
 
         function addMessage(text, sender) {
             const box = document.getElementById('chat-box');
             const div = document.createElement('div');
-            div.className = sender === 'user' ? 'user-msg p-3 max-w-[85%]' : 'bot-msg p-3 max-w-[85%]';
-            div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+            div.className = sender === 'user' ? 'msg-bubble user-msg' : 'msg-bubble bot-msg';
+            
+            // Format Bold Text and Line Breaks
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b class="text-cyan-200">$1</b>').replace(/\n/g, '<br>');
+            
+            // Add icon for bot messages
+            if (sender === 'bot') {
+                formattedText = '<i class="fas fa-sparkles text-cyan-400 mr-2 relative top-[1px]"></i>' + formattedText;
+            }
+
+            div.innerHTML = formattedText;
             box.appendChild(div);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const box = document.getElementById('chat-box');
             box.scrollTop = box.scrollHeight;
         }
     </script>
