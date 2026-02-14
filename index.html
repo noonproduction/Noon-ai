@@ -3,488 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Noon AI Pro</title>
+    <title>Noon AI | Vision Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --glass-bg: rgba(255, 255, 255, 0.08);
+            --primary-gradient: linear-gradient(135deg, #00c6ff, #0072ff);
+            --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --user-msg-bg: linear-gradient(135deg, #2563eb, #9333ea);
-            --bot-msg-bg: rgba(255, 255, 255, 0.1);
-            --sidebar-bg: #0f0f10;
+            --glass-blur: 20px;
         }
 
-        [data-theme="light"] {
-            --bg-color: #f0f4f8;
-            --text-color: #1f2937;
-            --glass-bg: rgba(255, 255, 255, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --user-msg-bg: linear-gradient(135deg, #06b6d4, #3b82f6);
-            --bot-msg-bg: #ffffff;
-            --sidebar-bg: #ffffff;
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #050505;
+            color: #ffffff;
+            height: 100dvh;
+            overflow: hidden;
+            margin: 0;
         }
 
-        html, body { height: 100dvh; overflow: hidden; font-family: 'Poppins', sans-serif; background: var(--bg-color); color: var(--text-color); transition: background 0.3s; margin: 0; }
-        .safe-area-top { padding-top: max(10px, env(safe-area-inset-top)); }
-        .safe-area-bottom { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+        /* --- Liquid Background Animation --- */
+        .liquid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: #000;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 10s infinite alternate;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #4c1d95; animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #0e7490; animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #be185d; animation-delay: -2s; opacity: 0.4; }
 
-        #onboarding-overlay { position: fixed; inset: 0; z-index: 200; background: var(--bg-color); display: flex; flex-direction: column; transition: opacity 0.5s; }
-        #onboarding-overlay.hidden-anim { opacity: 0; pointer-events: none; }
-        .slide { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 20px; animation: fadeIn 0.5s; }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        /* --- Glassmorphism Utilities --- */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Chat Bubbles --- */
+        .msg-enter { animation: slideUp 0.3s ease-out forwards; opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        .user-msg {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 20px 20px 4px 20px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        .bot-msg {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px 20px 20px 4px;
+        }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        /* --- Onboarding --- */
+        #onboarding { transition: opacity 0.5s ease; }
+        .slide { display: none; animation: fadeIn 0.5s; }
         .slide.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        #app-wrapper { display: flex; height: 100%; width: 100%; overflow: hidden; }
-        #sidebar { width: 280px; background: var(--sidebar-bg); height: 100%; position: absolute; left: -280px; top: 0; z-index: 50; transition: transform 0.3s ease; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
-        #sidebar.open { transform: translateX(280px); box-shadow: 5px 0 30px rgba(0,0,0,0.5); }
-        .history-item { padding: 12px; margin: 5px 10px; border-radius: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; opacity: 0.7; }
-        .history-item:hover, .history-item.active { background: var(--glass-bg); opacity: 1; }
         
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 40; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(2px); }
-        #overlay.show { opacity: 1; pointer-events: auto; }
-
-        #main-chat { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 10; height: 100%; }
-
-        .glass { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); }
-        .msg { max-width: 85%; padding: 12px 16px; margin-bottom: 15px; font-size: 0.95rem; line-height: 1.5; border-radius: 18px; word-wrap: break-word; }
-        .user-msg { align-self: flex-end; background: var(--user-msg-bg); color: white; border-bottom-right-radius: 4px; }
-        .bot-msg { align-self: flex-start; background: var(--bot-msg-bg); color: var(--text-color); border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
-        .msg img { max-width: 100%; border-radius: 12px; margin-top: 8px; }
-
-        #toast { position: fixed; top: 80px; left: 50%; transform: translate(-50%, -20px); background: #10b981; color: white; padding: 8px 16px; border-radius: 50px; opacity: 0; transition: 0.3s; z-index: 100; pointer-events: none; }
-        #toast.show { opacity: 1; transform: translate(-50%, 0); }
+        /* Markdown Styles */
+        .prose strong { color: #38bdf8; font-weight: 600; }
+        .prose code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+        .prose pre { background: #1e1e1e; padding: 10px; border-radius: 8px; overflow-x: auto; margin-top: 8px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-    <div id="onboarding-overlay" class="hidden">
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-[-1]">
-             <div class="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] bg-blue-600/30 blur-[80px] rounded-full animate-pulse"></div>
-             <div class="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-purple-600/30 blur-[80px] rounded-full animate-pulse"></div>
-        </div>
-        <div class="slide active" id="slide-1">
-            <div class="w-24 h-24 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-sparkles text-4xl text-white"></i></div>
-            <h1 class="text-3xl font-bold mb-4">Welcome to Noon AI</h1>
-            <p class="text-lg opacity-70 px-6">Experience the power of advanced AI right in your pocket.</p>
-        </div>
-        <div class="slide" id="slide-2">
-            <div class="w-24 h-24 bg-gradient-to-tr from-purple-400 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-eye text-4xl text-white"></i></div>
-            <h1 class="text-3xl font-bold mb-4">Vision Capabilities</h1>
-            <p class="text-lg opacity-70 px-6">Send photos and let Noon AI analyze them.</p>
-        </div>
-        <div class="slide" id="slide-3">
-            <div class="w-24 h-24 bg-gradient-to-tr from-green-400 to-emerald-600 rounded-3xl flex items-center justify-center shadow-2xl mb-8"><i class="fas fa-palette text-4xl text-white"></i></div>
-            <h1 class="text-3xl font-bold mb-4">Image Generation</h1>
-            <p class="text-lg opacity-70 px-6">Ask Noon AI to draw anything for you!</p>
-        </div>
-        <div class="w-full p-8 mt-auto safe-area-bottom">
-            <button onclick="nextSlide()" id="next-btn" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl shadow-lg active:scale-95 transition">Next</button>
-            <button onclick="skipOnboarding()" class="w-full text-center mt-4 opacity-50 text-sm p-2">Skip</button>
-        </div>
+    <div class="liquid-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
 
-    <div id="overlay" onclick="closeSidebar()"></div>
+    <div id="onboarding" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center hidden">
+        <div class="w-full max-w-md p-8 text-center">
+            
+            <div id="slide-1" class="slide active flex-col items-center">
+                <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center shadow-2xl mb-6 animate-bounce-slow">
+                    <i class="fas fa-robot text-5xl text-white"></i>
+                </div>
+                <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">Noon AI</h1>
+                <p class="text-gray-400 text-lg">Your intelligent creative partner.</p>
+            </div>
 
-    <div id="app-wrapper">
-        <div id="sidebar">
-            <div class="p-4 safe-area-top">
-                <button onclick="startNewChat()" class="w-full glass p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition group">
-                    <i class="fas fa-plus text-cyan-400 group-hover:scale-110 transition"></i>
-                    <span class="font-medium">New Chat</span>
+            <div id="slide-2" class="slide flex-col items-center">
+                <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-green-400 to-teal-600 flex items-center justify-center shadow-2xl mb-6">
+                    <i class="fas fa-eye text-5xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">AI Vision</h1>
+                <p class="text-gray-400">Upload photos and let AI analyze them instantly.</p>
+            </div>
+
+            <div id="slide-3" class="slide flex-col items-center">
+                <div class="w-32 h-32 rounded-full bg-gradient-to-tr from-pink-500 to-rose-600 flex items-center justify-center shadow-2xl mb-6">
+                    <i class="fas fa-palette text-5xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Create Art</h1>
+                <p class="text-gray-400">Generate stunning images from simple text.</p>
+            </div>
+
+            <div class="mt-12 w-full">
+                <button onclick="nextSlide()" id="next-btn" class="w-full py-4 rounded-xl bg-white text-black font-bold text-lg shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
+                    Next <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
-            <div class="px-4 pb-2 text-xs font-bold opacity-50 uppercase tracking-wider">Recent</div>
-            <div class="flex-1 overflow-y-auto" id="history-list"></div>
-            <div class="p-4 border-t border-white/10">
-                <button onclick="toggleSettings()" class="flex items-center gap-3 opacity-70 hover:opacity-100 transition p-2 w-full"><i class="fas fa-cog"></i> Settings</button>
+        </div>
+    </div>
+
+    <div class="flex flex-col h-full relative z-10">
+        
+        <header class="glass-panel mx-4 mt-4 p-4 rounded-2xl flex items-center justify-between shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Noon" class="w-10 h-10 rounded-lg bg-white/10 p-1 border border-white/20">
+                    <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none">Noon AI</h1>
+                    <span class="text-xs text-blue-400 font-medium tracking-wide">PRO VERSION</span>
+                </div>
+            </div>
+            <button onclick="clearChat()" class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center transition text-gray-400 hover:text-red-400">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </header>
+
+        <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
+            <div class="bot-msg msg p-4 max-w-[85%] mr-auto">
+                <div class="flex items-center gap-2 mb-2 text-blue-400 text-xs font-bold uppercase tracking-wider">
+                    <i class="fas fa-sparkles"></i> Noon AI
+                </div>
+                <div class="prose text-gray-200 text-sm leading-relaxed">
+                    Hello! I am Noon AI. You can chat with me, ask me to generate images, or upload photos for analysis. How can I help?
+                </div>
             </div>
         </div>
 
-        <div id="main-chat">
-            <div class="glass flex items-center justify-between px-4 py-3 m-2 rounded-2xl shadow-lg z-20 safe-area-top shrink-0">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSidebar()">
-                    <i class="fas fa-bars text-xl opacity-80"></i>
-                    <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 border border-white/10">
-                    <div>
-                        <h1 class="font-bold text-lg leading-tight">Noon AI</h1>
-                        <div class="flex items-center gap-1.5"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span><span class="text-[10px] font-medium opacity-70">PRO</span></div>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleTheme()" class="w-9 h-9 rounded-full glass flex items-center justify-center hover:bg-white/10"><i class="fas fa-moon" id="theme-icon"></i></button>
-                </div>
-            </div>
-
-            <div id="chat-box" class="flex-1 overflow-y-auto px-4 py-2 flex flex-col scroll-smooth"></div>
-
-            <div id="image-preview" class="hidden px-4 py-2 mx-4 mb-2 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 items-center justify-between shrink-0">
+        <div class="p-4 shrink-0">
+            <div id="image-preview" class="hidden glass-panel mb-2 p-2 rounded-xl flex items-center justify-between mx-1">
                 <div class="flex items-center gap-3">
-                    <img id="preview-img" src="" class="w-10 h-10 rounded-lg object-cover border border-white/20">
-                    <span class="text-xs opacity-80">Photo attached</span>
+                    <img id="preview-img" src="" class="w-12 h-12 rounded-lg object-cover bg-black">
+                    <span class="text-xs text-gray-300">Image attached</span>
                 </div>
-                <button onclick="removeImage()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+                <button onclick="removeImage()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="p-3 z-20 safe-area-bottom shrink-0">
-                <div class="glass p-1.5 pl-2 rounded-[28px] flex items-center gap-2 shadow-xl">
-                    <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleImage(event)">
-                    
-                    <button onclick="document.getElementById('image-input').click()" class="w-10 h-10 flex items-center justify-center text-cyan-400 hover:bg-white/10 rounded-full transition active:scale-90"><i class="fas fa-plus text-lg"></i></button>
-                    <button onclick="generateImage(event)" class="w-10 h-10 flex items-center justify-center text-purple-400 hover:bg-white/10 rounded-full transition active:scale-90"><i class="fas fa-palette text-lg"></i></button>
+            <div class="glass-panel p-2 rounded-[24px] flex items-center gap-2 pl-3">
+                <input type="file" id="image-input" accept="image/*" class="hidden" onchange="handleImage(event)">
+                
+                <button onclick="document.getElementById('image-input').click()" class="text-gray-400 hover:text-blue-400 transition w-8 h-8 flex items-center justify-center">
+                    <i class="fas fa-image text-xl"></i>
+                </button>
+                
+                <button onclick="generateImageMode()" class="text-gray-400 hover:text-pink-400 transition w-8 h-8 flex items-center justify-center">
+                    <i class="fas fa-paint-brush text-xl"></i>
+                </button>
 
-                    <form class="flex-1 flex gap-2" onsubmit="sendMessage(event)">
-                        <input type="text" id="msg-input" class="w-full bg-transparent outline-none text-sm px-2" style="color: var(--text-color);" placeholder="Message Noon AI..." autocomplete="off">
-                        <button type="submit" class="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fas fa-paper-plane text-sm translate-x-px translate-y-px"></i></button>
-                    </form>
-                </div>
+                <input type="text" id="msg-input" placeholder="Message Noon AI..." class="flex-1 bg-transparent border-none outline-none text-white text-sm placeholder-gray-500 h-10" autocomplete="off" onkeypress="handleEnter(event)">
+
+                <button onclick="sendMessage()" class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full text-white shadow-lg hover:shadow-blue-600/50 transition active:scale-95 flex items-center justify-center">
+                    <i class="fas fa-paper-plane text-sm"></i>
+                </button>
+            </div>
+            <div class="text-center mt-2">
+                <p class="text-[10px] text-gray-600">Powered by Noon Production AI</p>
             </div>
         </div>
     </div>
-
-    <div id="settings-modal" class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass w-full max-w-sm rounded-3xl p-6 transform scale-95 opacity-0 transition-all duration-300 relative" id="settings-content">
-            <button onclick="toggleSettings()" class="absolute top-4 right-4 text-gray-400 p-2"><i class="fas fa-times"></i></button>
-            <div class="text-center">
-                <img src="./IMG-20260206-WA0016.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'" class="w-16 h-16 rounded-xl mx-auto mb-2 shadow-lg object-contain bg-white/10 p-1">
-                <h2 class="text-xl font-bold">Noon AI Pro</h2>
-                <p class="text-xs opacity-60">Version 5.0 (Updated)</p>
-            </div>
-            <div class="mt-4 space-y-2">
-                <button onclick="resetOnboarding()" class="w-full p-3 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-3"><i class="fas fa-redo"></i> Reset Onboarding</button>
-                <button onclick="clearAllHistory()" class="w-full p-3 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-3"><i class="fas fa-trash"></i> Delete All History</button>
-                <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-center text-xs opacity-70">connect.noonai@gmail.com</div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="toast"><i class="fas fa-check-circle mr-2"></i> Saved!</div>
 
     <script>
-        // UPDATED BACKEND URL
+        // *** CONFIGURATION ***
+        // පහත URL එක ඔබේ Replit Backend URL එකට මාරු කරන්න
         const BACKEND_URL = "https://3f5193be-7ef0-455a-808a-87fcd74b4eae-00-5fz0revgwzns.sisko.replit.dev/chat";
         
-        let isDark = true;
-        let imgData = null;
-        let sessions = [];
-        let currentSessionId = null;
         let currentSlide = 1;
-        const totalSlides = 3;
+        let imgData = null;
 
+        // --- Init ---
         window.onload = function() {
-            if (!localStorage.getItem('noon_onboarding_complete')) {
-                document.getElementById('onboarding-overlay').classList.remove('hidden');
+            // Welcome Screen Logic (Fix)
+            const isOnboarded = localStorage.getItem('noon_ai_visited');
+            if (!isOnboarded) {
+                document.getElementById('onboarding').classList.remove('hidden');
+                document.getElementById('onboarding').classList.add('flex');
             }
-            loadSessions();
-            if(localStorage.getItem('noon_theme') === 'light') toggleTheme();
         };
-
-        // --- Image Generation Logic ---
-        async function generateImage(e) {
-            e.preventDefault();
-            const input = document.getElementById('msg-input');
-            const prompt = input.value.trim();
-            if (!prompt) { alert("Type what you want to draw first!"); return; }
-
-            addMsg(`🎨 Generate: "${prompt}"`, 'user');
-            input.value = '';
-            
-            const loadId = showLoad("Painting...");
-            const randomSeed = Math.floor(Math.random() * 1000000);
-            const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${randomSeed}&width=768&height=768&nologo=true`;
-
-            const imgObj = new Image();
-            imgObj.onload = function() {
-                rmLoad(loadId);
-                const imageHtml = `
-                    <div class="flex flex-col gap-2">
-                        <span>Here is your image for: "<b>${prompt}</b>"</span>
-                        <div class="relative group">
-                            <img src="${imageUrl}" class="rounded-xl shadow-lg w-full h-auto min-h-[200px] bg-white/5" alt="Generated Image">
-                            <button onclick="downloadImage('${imageUrl}')" class="absolute bottom-3 right-3 bg-black/70 hover:bg-black text-white p-2 rounded-full backdrop-blur-md transition-all shadow-xl border border-white/20 z-10">
-                                <i class="fas fa-download"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                addMsg(imageHtml, 'bot');
-            };
-
-            imgObj.onerror = function() {
-                rmLoad(loadId);
-                addMsg(`Sorry, the image couldn't load due to network issues. <br><a href="${imageUrl}" target="_blank" class="text-cyan-400 underline font-bold mt-2 block">Click here to try viewing it directly</a>`, 'bot');
-            };
-
-            imgObj.src = imageUrl;
-        }
-
-        async function downloadImage(url) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = `noon-ai-art-${Date.now()}.jpg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(blobUrl);
-                toast(); 
-            } catch (error) {
-                window.open(url, '_blank');
-            }
-        }
 
         // --- Onboarding Logic ---
         function nextSlide() {
-            if (currentSlide < totalSlides) {
+            const total = 3;
+            if (currentSlide < total) {
                 document.getElementById(`slide-${currentSlide}`).classList.remove('active');
                 currentSlide++;
                 document.getElementById(`slide-${currentSlide}`).classList.add('active');
-                if (currentSlide === totalSlides) document.getElementById('next-btn').innerText = "Get Started";
+                if(currentSlide === total) document.getElementById('next-btn').innerHTML = "Get Started 🚀";
             } else {
-                finishOnboarding();
+                completeOnboarding();
             }
         }
 
-        function finishOnboarding() { 
-            localStorage.setItem('noon_onboarding_complete', 'true'); 
-            const ov = document.getElementById('onboarding-overlay'); 
-            ov.classList.add('hidden-anim'); 
-            setTimeout(() => ov.classList.add('hidden'), 500); 
+        function completeOnboarding() {
+            localStorage.setItem('noon_ai_visited', 'true');
+            const ob = document.getElementById('onboarding');
+            ob.style.opacity = '0';
+            setTimeout(() => { ob.style.display = 'none'; }, 500);
         }
 
-        function skipOnboarding() { finishOnboarding(); }
-        function resetOnboarding() { localStorage.removeItem('noon_onboarding_complete'); location.reload(); }
-
-        // --- Chat Session Logic ---
-        function loadSessions() { 
-            const saved = localStorage.getItem('noon_sessions'); 
-            if (saved) { 
-                sessions = JSON.parse(saved); 
-                if (sessions.length > 0) loadChat(sessions[0].id); 
-                else startNewChat(); 
-            } else {
-                startNewChat(); 
-            }
-            renderSidebar(); 
+        // --- Chat Logic ---
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
         }
 
-        function startNewChat() { 
-            const newId = Date.now().toString(); 
-            const newSession = { id: newId, title: "New Chat", messages: [{ html: "Hello! How can I help you today?", role: "bot" }] }; 
-            sessions.unshift(newSession); 
-            currentSessionId = newId; 
-            saveSessions(); 
-            renderSidebar(); 
-            renderChat(newSession.messages); 
-            closeSidebar(); 
-        }
+        async function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
 
-        function loadChat(id) { 
-            currentSessionId = id; 
-            const session = sessions.find(s => s.id === id); 
-            if (session) { 
-                renderChat(session.messages); 
-                renderSidebar(); 
-                closeSidebar(); 
-            } 
-        }
-
-        function deleteSession(e, id) { 
-            e.stopPropagation(); 
-            if(confirm("Delete this chat?")) { 
-                sessions = sessions.filter(s => s.id !== id); 
-                saveSessions(); 
-                if(sessions.length === 0) startNewChat(); 
-                else if(currentSessionId === id) loadChat(sessions[0].id); 
-                else renderSidebar(); 
-            } 
-        }
-
-        function saveSessions() { localStorage.setItem('noon_sessions', JSON.stringify(sessions)); }
-
-        function renderSidebar() { 
-            const list = document.getElementById('history-list'); 
-            list.innerHTML = ''; 
-            sessions.forEach(s => { 
-                const isActive = s.id === currentSessionId ? 'active' : ''; 
-                const div = document.createElement('div'); 
-                div.className = `history-item ${isActive}`; 
-                div.onclick = () => loadChat(s.id); 
-                div.innerHTML = `<i class="fas fa-message text-cyan-400"></i><span class="flex-1 truncate">${s.title}</span><button onclick="deleteSession(event, '${s.id}')" class="opacity-50 hover:text-red-400 p-1"><i class="fas fa-trash"></i></button>`; 
-                list.appendChild(div); 
-            }); 
-        }
-
-        function renderChat(messages) { 
-            const box = document.getElementById('chat-box'); 
-            box.innerHTML = ''; 
-            messages.forEach(msg => addMsgToUI(msg.html, msg.role, false)); 
-            box.scrollTop = box.scrollHeight; 
-        }
-
-        // --- Message Sending Logic ---
-        async function sendMessage(e) {
-            e.preventDefault(); 
-            const input = document.getElementById('msg-input'); 
-            const text = input.value.trim(); 
-            
             if (!text && !imgData) return;
 
-            const session = sessions.find(s => s.id === currentSessionId); 
-            if (session && session.messages.length <= 1 && text) { 
-                session.title = text.substring(0, 20) + (text.length > 20 ? "..." : ""); 
-                renderSidebar(); 
+            // 1. User Message Display
+            let displayHTML = text.replace(/\n/g, "<br>");
+            if (imgData) {
+                displayHTML += `<br><img src="${imgData}" class="mt-2 rounded-lg max-h-40 border border-white/20">`;
             }
+            appendMessage('user', displayHTML);
 
-            let displayHtml = text; 
-            if (imgData) displayHtml += `<br><img src="${imgData}">`;
+            input.value = '';
+            const payloadImage = imgData;
+            removeImage(); // Clear image after sending
             
-            addMsg(displayHtml, 'user'); 
-            
-            input.value = ''; 
-            const toSendImg = imgData; 
-            removeImage(); 
-            
-            const loadId = showLoad();
+            // 2. Loading Indicator
+            const loadingId = showLoading();
 
-            try { 
-                const res = await fetch(BACKEND_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ message: text, image: toSendImg }) 
-                }); 
-                const data = await res.json(); 
-                rmLoad(loadId); 
-                addMsg(data.reply, 'bot'); 
-            } catch (error) { 
-                rmLoad(loadId); 
-                addMsg("Brain is sleeping... Waking up! Try again in 10s.", 'bot'); 
-                console.error(error);
+            try {
+                // 3. Send to Backend
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, image: payloadImage })
+                });
+
+                const data = await response.json();
+                removeLoading(loadingId);
+                
+                // 4. Format & Display Bot Response
+                let botText = formatResponse(data.reply);
+                appendMessage('bot', botText);
+
+            } catch (error) {
+                removeLoading(loadingId);
+                appendMessage('bot', `<span class="text-red-400">Error connecting to server. Please check your internet or try again.</span>`);
             }
         }
 
-        function addMsg(html, role) { 
-            const session = sessions.find(s => s.id === currentSessionId); 
-            if(session) { 
-                session.messages.push({ html: html, role: role }); 
-                saveSessions(); 
-            } 
-            addMsgToUI(html, role, true); 
+        // --- Image Generation Logic ---
+        function generateImageMode() {
+            const prompt = prompt("Enter a description for the image you want to create:");
+            if(prompt) {
+                appendMessage('user', `🎨 Generate Image: <b>${prompt}</b>`);
+                const loadId = showLoading("Generating Art...");
+                
+                const seed = Math.floor(Math.random() * 999999);
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=1024&height=1024&nologo=true`;
+                
+                const img = new Image();
+                img.onload = () => {
+                    removeLoading(loadId);
+                    appendMessage('bot', `
+                        <div class="flex flex-col gap-2">
+                            <span>Here is your art piece:</span>
+                            <img src="${imageUrl}" class="w-full rounded-xl border border-white/10 shadow-lg">
+                            <a href="${imageUrl}" download="noon-art.jpg" target="_blank" class="text-xs text-blue-400 underline mt-1">Download High Quality</a>
+                        </div>
+                    `);
+                };
+                img.onerror = () => {
+                    removeLoading(loadId);
+                    appendMessage('bot', "Failed to generate image. Please try again.");
+                };
+                img.src = imageUrl;
+            }
         }
 
-        function addMsgToUI(html, role, scroll) { 
-            const box = document.getElementById('chat-box'); 
-            const div = document.createElement('div'); 
-            div.className = role === 'user' ? 'user-msg msg' : 'bot-msg msg'; 
+        // --- UI Helpers ---
+        function appendMessage(role, html) {
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.className = `msg msg-enter max-w-[85%] p-4 mb-4 text-sm leading-relaxed shadow-md ${role === 'user' ? 'user-msg ml-auto text-white' : 'bot-msg mr-auto text-gray-100'}`;
             
-            if (role === 'bot') { 
-                html = `<div class="flex items-center gap-2 mb-1 text-cyan-400 font-bold text-xs"><i class="fas fa-robot"></i> Noon AI</div>` + 
-                       html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>') + 
-                       `<div class="flex gap-4 mt-2 pt-2 border-t border-white/10 opacity-50"><button onclick="toast()" class="hover:text-green-400"><i class="fas fa-thumbs-up"></i></button><button onclick="toast()" class="hover:text-red-400"><i class="fas fa-thumbs-down"></i></button></div>`; 
-            } 
+            if (role === 'bot') {
+                html = `<div class="flex items-center gap-2 mb-2 text-cyan-400 text-xs font-bold uppercase tracking-wider"><i class="fas fa-robot"></i> Noon AI</div><div class="prose">${html}</div>`;
+            }
             
-            div.innerHTML = html; 
-            box.appendChild(div); 
-            if(scroll) box.scrollTop = box.scrollHeight; 
+            div.innerHTML = html;
+            box.appendChild(div);
+            scrollToBottom();
         }
 
-        // --- UI Interactions ---
-        function toggleSidebar() { 
-            const sb = document.getElementById('sidebar'); 
-            const ov = document.getElementById('overlay'); 
-            if(sb.classList.contains('open')) { 
-                sb.classList.remove('open'); 
-                ov.classList.remove('show'); 
-            } else { 
-                sb.classList.add('open'); 
-                ov.classList.add('show'); 
-            } 
+        function showLoading(text = "Thinking...") {
+            const id = 'load-' + Date.now();
+            const box = document.getElementById('chat-box');
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'bot-msg msg mr-auto p-3 flex items-center gap-3 text-gray-400 text-sm border border-white/5';
+            div.innerHTML = `<i class="fas fa-circle-notch fa-spin text-cyan-400"></i> ${text}`;
+            box.appendChild(div);
+            scrollToBottom();
+            return id;
         }
 
-        function closeSidebar() { 
-            document.getElementById('sidebar').classList.remove('open'); 
-            document.getElementById('overlay').classList.remove('show'); 
+        function removeLoading(id) {
+            const el = document.getElementById(id);
+            if(el) el.remove();
         }
 
-        function toggleTheme() { 
-            isDark = !isDark; 
-            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light'); 
-            document.getElementById('theme-icon').className = isDark ? 'fas fa-moon' : 'fas fa-sun text-orange-400'; 
-            localStorage.setItem('noon_theme', isDark ? 'dark' : 'light'); 
+        function scrollToBottom() {
+            const box = document.getElementById('chat-box');
+            box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
         }
 
-        function toggleSettings() { 
-            const m = document.getElementById('settings-modal'); 
-            const c = document.getElementById('settings-content'); 
-            if (m.classList.contains('hidden')) { 
-                m.classList.remove('hidden'); 
-                setTimeout(() => { 
-                    c.classList.remove('scale-95','opacity-0'); 
-                    c.classList.add('scale-100','opacity-100'); 
-                }, 10); 
-            } else { 
-                c.classList.remove('scale-100','opacity-100'); 
-                c.classList.add('scale-95','opacity-0'); 
-                setTimeout(() => m.classList.add('hidden'), 300); 
-            } 
-            closeSidebar(); 
+        function handleImage(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imgData = e.target.result;
+                    document.getElementById('preview-img').src = imgData;
+                    document.getElementById('image-preview').classList.remove('hidden');
+                    document.getElementById('image-preview').classList.add('flex');
+                }
+                reader.readAsDataURL(file);
+            }
         }
 
-        function clearAllHistory() { 
-            if(confirm("Delete ALL chats?")) { 
-                localStorage.removeItem('noon_sessions'); 
-                sessions = []; 
-                startNewChat(); 
-                toggleSettings(); 
-            } 
+        function removeImage() {
+            imgData = null;
+            document.getElementById('image-input').value = '';
+            document.getElementById('image-preview').classList.add('hidden');
+            document.getElementById('image-preview').classList.remove('flex');
         }
 
-        // --- Image Handling ---
-        function handleImage(e) { 
-            const file = e.target.files[0]; 
-            if (!file) return; 
-            const reader = new FileReader(); 
-            reader.onload = (e) => { 
-                imgData = e.target.result; 
-                document.getElementById('preview-img').src = imgData; 
-                document.getElementById('image-preview').classList.remove('hidden'); 
-                document.getElementById('image-preview').classList.add('flex'); 
-            }; 
-            reader.readAsDataURL(file); 
+        function clearChat() {
+            if(confirm("Clear conversation history?")) {
+                document.getElementById('chat-box').innerHTML = '';
+                appendMessage('bot', "History cleared. Start a new topic!");
+            }
         }
 
-        function removeImage() { 
-            imgData = null; 
-            document.getElementById('image-input').value = ''; 
-            document.getElementById('image-preview').classList.add('hidden'); 
-            document.getElementById('image-preview').classList.remove('flex'); 
-        }
-
-        function showLoad(text="Thinking...") { 
-            const id = 'l-' + Date.now(); 
-            const box = document.getElementById('chat-box'); 
-            const div = document.createElement('div'); 
-            div.id = id; 
-            div.className = 'bot-msg msg flex items-center gap-2 text-gray-400'; 
-            div.innerHTML = `<i class="fas fa-circle-notch fa-spin text-cyan-400"></i> ${text}`; 
-            box.appendChild(div); 
-            box.scrollTop = box.scrollHeight; 
-            return id; 
-        }
-
-        function rmLoad(id) { document.getElementById(id)?.remove(); }
-        
-        function toast() { 
-            const t = document.getElementById('toast'); 
-            t.classList.add('show'); 
-            setTimeout(() => t.classList.remove('show'), 2000); 
+        function formatResponse(text) {
+            // Simple Markdown formatter
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                .replace(/\n/g, '<br>');
         }
     </script>
 </body>
